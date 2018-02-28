@@ -54,6 +54,7 @@ int unlinkDataBlock(inode *file)
       head = head -> nextdatablock;
     }
     file -> noOfDatablocks = 0;
+    file->datablocksarray=NULL;
     return 1;
   }
   else
