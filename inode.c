@@ -39,14 +39,6 @@ int createInode(char * name, char * type)
 
     strcpy(newInode->name,name);
     strcpy(newInode->type,type);
-    if(strcmp(type,"directory"))
-    {
-      newInode->n_link=2;
-    }
-    else if(strcmp(type,"file"))
-    {
-      newInode->n_link=0;
-    }
     newInode->createtime=time(0);
     newInode->datablocksarray=NULL;
     newInode->noOfDatablocks=0;
