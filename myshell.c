@@ -98,7 +98,8 @@ int main()
 			char * name= tokens[1];
 			char * content =(char *)malloc(sizeof(char)*MAX_CONTENT_LIMIT);
 			printf("enter the content you want to write into this file\n");
-			fgets(content, MAX_CONTENT_LIMIT, stdin);
+			//fgets(content, MAX_CONTENT_LIMIT, stdin);
+			scanf("%[^\n]%*c",content);
 			//printf("here%s,%s,%d\n",name,content);
 			pid_t who=getpid();
 			if(!sfsopen(name,who))
