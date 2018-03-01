@@ -185,13 +185,14 @@ int sfswrite(char *filename,pid_t who,char *content)
   int length2=strlen(content);
   filetable * entry=getEntry(file->id,who);
   int currfilepointer=entry->currfilepointer;
-  char *blockcontent=content;
+  char *blockcontent = (char *)malloc(sizeof(char) * strlen(content));
+  strcpy(blockcontent, content);
   printf("1\n");
   if(file->datablocksarray!=NULL)
   {
     printf("2\n");
-    int filesize=getSizeOfFile(file);
-    char *blockcontent=sfsread(filename,who,filesize);
+    int filesize = getSizeOfFile(file);
+    blockcontent = readDataBlocks(file);
     if(!unlinkDataBlock(file))
     {
       printf("couldnt unlink all the datablocks!\n");

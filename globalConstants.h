@@ -10,7 +10,7 @@
 #include <sys/time.h>
 #include <pthread.h>
 
-int currentshellpid=getpid();//this is the shell workaround we have to modify the code to only pass this to all functions
+//int currentshellpid=getpid();//this is the shell workaround we have to modify the code to only pass this to all functions
 // and also we gotta include an additional command in the shell called
 //switch <pid> which will change this value.
 
@@ -35,7 +35,7 @@ int currentshellpid=getpid();//this is the shell workaround we have to modify th
       	int noOfInodes;
       	struct inode * parent;
       	int fdcount;//for no of processes accessing this
-
+            int n_link;
       }inode;
 
       int createInode(char * name, char * type);
