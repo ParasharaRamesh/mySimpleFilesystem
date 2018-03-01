@@ -5,6 +5,7 @@
 extern inode * currdirectory;
 extern inode * root;
 extern filetable * FileTable;
+extern int currentshellpid;
 
 void mkfs()
 {
@@ -35,16 +36,10 @@ int sfsdelete(char *name)
   }
 }
 
-int sfsopen(char * name,pid_t who)
+int sfsopen(char * name,int who)
 {
   inode * file= getInodeFromCurrDirectory(name,"file");
-  if(getEntry(file->id,who)!=NULL)
-  {
-    printf("this process already has this file open!\n");
-    return 1;
-  }
-  else
-  {
+
     if(addEntry(file,who)==1)
     {
       file->fdcount++;
@@ -56,11 +51,10 @@ int sfsopen(char * name,pid_t who)
       return 0;
     }
 
-  }
 
 }
 
-int sfsclose(char * name , pid_t who)
+int sfsclose(char * name , int who)
 {
   inode * file= getInodeFromCurrDirectory(name,"file");
   return removeEntry(file,who);
@@ -125,7 +119,7 @@ int sfsreaddir()
   return 1;
 }
 
-char *sfsread(char *filename,pid_t who,int nbytes)
+char *sfsread(char *filename,int who,int nbytes)
 {
 
   //get the inode of this filename and using the inode no and the who search the filetable and get the corresponding filetable entry
@@ -173,7 +167,7 @@ char *sfsread(char *filename,pid_t who,int nbytes)
 
 }
 
-int sfswrite(char *filename,pid_t who,char *content)
+int sfswrite(char *filename,int who,char *content)
 {
   printf("inside %s\t%d\t%s\n",filename,who,content);
   inode *file=getInodeFromCurrDirectory(filename,"file");
@@ -198,6 +192,7 @@ int sfswrite(char *filename,pid_t who,char *content)
       printf("couldnt unlink all the datablocks!\n");
       return 0;
     }
+    printf("block content is %s\n",blockcontent);
     if(currfilepointer==filesize)
     {
       blockcontent=realloc(blockcontent,filesize+length2);
@@ -205,7 +200,7 @@ int sfswrite(char *filename,pid_t who,char *content)
     }
     else if(filesize>(currfilepointer+length2))
     {
-      strncpy(&blockcontent[currfilepointer],content,length2-1);
+      strncpy(&blockcontent[currfilepointer],content,length2);
     }
     else
     {
@@ -213,6 +208,7 @@ int sfswrite(char *filename,pid_t who,char *content)
       strcpy(&blockcontent[currfilepointer],content);
     }
     printf("22\n");
+    printf("block content after is %s\n",blockcontent);
   }
   if(file->datablocksarray!=NULL)
   {
@@ -302,7 +298,7 @@ int sfswrite(char *filename,pid_t who,char *content)
 
 
 
-int sfslseek(char *name,pid_t who,int offset)
+int sfslseek(char *name,int who,int offset)
 {
   //find the inode with this name in currdirectory and then call isPresent in filetable using the filedescriptor and the who and then get that filetable entry and modify the curr file pointer
   inode * file=NULL;

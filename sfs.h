@@ -24,14 +24,14 @@ int sfsdelete(char *name);
 
 
 //finished
-int sfsclose(char * name,pid_t who);
-int sfsopen(char * name , pid_t who);
-int sfslseek(char *name,pid_t who,int offset);
+int sfsclose(char * name,int who);
+int sfsopen(char * name , int who);
+int sfslseek(char *name,int who,int offset);
 
 
 //todo
-int sfswrite(char *filename,pid_t who,char *content);//removed mode only write from now on no append mode
-char * sfsread(char * name,pid_t who,int nbytes);
+int sfswrite(char *filename,int who,char *content);//removed mode only write from now on no append mode
+char * sfsread(char * name,int who,int nbytes);
 
 
 

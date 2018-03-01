@@ -10,7 +10,8 @@
 #include <sys/time.h>
 #include <pthread.h>
 
-//int currentshellpid=getpid();//this is the shell workaround we have to modify the code to only pass this to all functions
+int currentshellpid;
+//this is the shell workaround we have to modify the code to only pass this to all functions
 // and also we gotta include an additional command in the shell called
 //switch <pid> which will change this value.
 
@@ -64,7 +65,7 @@
       {
 
       	int filedescriptor;//same as inode no for easier access
-      	pid_t who;
+      	int who;
       	int currfilepointer;
       	struct filetable * nextfiletableentry;
 
@@ -74,10 +75,10 @@
       //filetable structure
 
 
-      int addEntry(inode *file,pid_t who);
-      int removeEntry(inode *file,pid_t who);
+      int addEntry(inode *file,int who);
+      int removeEntry(inode *file,int who);
       int flushfiletable(inode *file);
-      filetable * getEntry(int fd, pid_t who);
+      filetable * getEntry(int fd, int who);
 
 //SUPERBLOCK RELATED
 

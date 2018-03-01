@@ -4,11 +4,15 @@
 #include<string.h>
 #include<stdlib.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 //purpose of this file is to mimic the shell and support the following commands and call the appropriate handlers
+extern int currentshellpid;
 
 int main()
 {
+	currentshellpid=getpid();
+	printf("current shell pid is %d\n",currentshellpid);
 	char *command=NULL;
 	char *otherpartofinput=NULL;
 	char input[50];
@@ -32,6 +36,7 @@ int main()
 
 		if(strcmp(command,"touch")==0)
 		{
+			printf("current shell pid is %d\n",currentshellpid);
 			otherpartofinput=getOtherPartFromInput(input);
 			if(!sfscreate(otherpartofinput))
 			{
@@ -39,8 +44,19 @@ int main()
 			}
 
 		}
+		else if(strcmp(command,"switch")==0)
+		{
+			printf("1\n");
+			char **tokens=split(input,2);
+			printf("2\n");
+			int pid=atoi(tokens[1]);
+			printf("%d\n",pid);
+			currentshellpid=pid;
+			printf("currentshellpid is changed %d\n",currentshellpid);
+		}
 		else if(strcmp(input,"ls")==0)
 		{
+			printf("current shell pid is %d\n",currentshellpid);
 			if(!sfsreaddir())
 			{
 				printf("empty!!\n");
@@ -50,6 +66,7 @@ int main()
 
 		else if(strcmp(command,"mkdir")==0)
 		{
+			printf("current shell pid is %d\n",currentshellpid);
 			otherpartofinput=getOtherPartFromInput(input);
 			if(!sfsmkdir(otherpartofinput))
 			{
@@ -58,6 +75,7 @@ int main()
 		}
 		else if(strcmp(command,"cd")==0)
 		{
+			printf("current shell pid is %d\n",currentshellpid);
 			otherpartofinput=getOtherPartFromInput(input);
 			if(!sfschangedir(otherpartofinput))
 			{
@@ -66,6 +84,7 @@ int main()
 		}
 		else if(strcmp(command,"rmdir")==0)
 		{
+			printf("current shell pid is %d\n",currentshellpid);
 				otherpartofinput=getOtherPartFromInput(input);
 				if(!sfsrmdir(otherpartofinput))
 					printf("Successfully deleted directory\n");
@@ -73,6 +92,7 @@ int main()
 		}
 		else if(strcmp(command,"rm")==0)
 		{
+			printf("current shell pid is %d\n",currentshellpid);
 				otherpartofinput=getOtherPartFromInput(input);
 				if(!sfsdelete(otherpartofinput))
 				{
@@ -82,9 +102,10 @@ int main()
 
 		else if(strcmp(command,"close")==0)
 		{
+			printf("current shell pid is %d\n",currentshellpid);
 				char **tokens=split(input,2);
 				char *filename=tokens[1];
-				if(!sfsclose(filename,getpid()))
+				if(!sfsclose(filename,currentshellpid))
 				{
 					printf("cant close this file!!\n");
 				}
@@ -93,7 +114,7 @@ int main()
 
 		else if(strstr(command,"write")==command)
 		{
-
+printf("current shell pid is %d\n",currentshellpid);
 			char ** tokens =split(input,3);
 			char * name= tokens[1];
 			char * content =(char *)malloc(sizeof(char)*MAX_CONTENT_LIMIT);
@@ -101,13 +122,14 @@ int main()
 			//fgets(content, MAX_CONTENT_LIMIT, stdin);
 			scanf("%[^\n]%*c",content);
 			//printf("here%s,%s,%d\n",name,content);
-			pid_t who=getpid();
-			if(!sfsopen(name,who))
+			if(!sfsopen(name,currentshellpid))
 			{
 				printf("cant open this file!\n");
 			}
+			printf("shaa\n");
 			showFileTableContents();//debug line
-			if(!sfswrite(name,who,content))
+			printf("shaa\n");
+			if(!sfswrite(name,currentshellpid,content))
 			{
 				printf("cant write into this file!\n");
 			}
@@ -117,11 +139,12 @@ int main()
 
 		else if(strstr(command,"read")==command)
 		{
+			printf("current shell pid is %d\n",currentshellpid);
 			char ** tokens =split(input,3);
 			printf("0\n");
 			char * name= tokens[1];
 			int nbytes =atoi(tokens[2]);
-			pid_t who=getpid();
+			int who=currentshellpid;
 			printf("%s\t%d\t%d",name,nbytes,who);
 			printf("a\n");
 			if(!sfsopen(name,who))
@@ -138,6 +161,7 @@ int main()
 
 		else if(strstr(command,"cat")==command)
 		{
+			printf("current shell pid is %d\n",currentshellpid);
 			//read filename nbytes
 			//otherpartofinput=getOtherPartFromInput(input);
 			char ** tokens =split(input,2);
@@ -150,7 +174,7 @@ int main()
 			//int space=strstr(command," ");
 			else
 			{
-				pid_t who=getpid();
+				int who=currentshellpid;
 				char *content = readDataBlocks(file);
 				if(content == NULL)
 				{
@@ -166,10 +190,11 @@ int main()
 		//lseek filename offset
 		else if(strstr(command,"lseek")==command)
 		{
+			printf("current shell pid is %d\n",currentshellpid);
 			char ** tokens =split(input,3);
 			char *filename=tokens[1];
 			int offset=atoi(tokens[2]);
-			pid_t who =getpid();
+			int who =currentshellpid;
 
 			if(!sfslseek(filename,who,offset))
 			{

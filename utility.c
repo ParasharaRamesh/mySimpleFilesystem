@@ -4,7 +4,7 @@
 extern inode *root;
 extern inode * currdirectory;
 extern filetable *FileTable;
-
+extern int currentshellpid;
 //myshell uttility functions
 void printSupportedCommands()
 {

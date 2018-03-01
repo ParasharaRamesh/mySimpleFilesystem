@@ -6,7 +6,9 @@
 
 filetable * FileTable=NULL;
 
-filetable* getEntry(int fd,pid_t who)
+extern int currentshellpid;
+
+filetable* getEntry(int fd,int who)
 {
   //traverse the filetable and search for the entry with file's inode id and the who and
   filetable * head= FileTable;
@@ -22,42 +24,67 @@ filetable* getEntry(int fd,pid_t who)
 }
 
 
-int addEntry(inode *file,pid_t who)
+int addEntry(inode *file,int who)
 {
+
+printf("1\n");
+  if(getEntry(file->id,who)!=NULL)
+  {
+    printf("this process already has this file open!\n");
+    return 1;
+  }
+printf("2\n");
   int fd=file->id;
   int count=0;
   filetable * head;
   if(FileTable == NULL)//create the first filetable nextfiletableentry
   {
+    printf("3\n");
     FileTable=(filetable *)malloc(sizeof(filetable));
     if(FileTable==NULL)
     {
       return 0;
     }
     head=FileTable;
+    head->filedescriptor=fd;
+    head->nextfiletableentry=NULL;
+    head->currfilepointer=0;
+    head->who=who;
+    printf("4\n");
+    return 1;
   }
   else
   {
+    printf("5\n");
     head=FileTable;
     while(head->nextfiletableentry!= NULL)
     {
+      printf("6\n");
       count++;
       head= head->nextfiletableentry;
     }
+
+    printf("7\n");
     if(count>=FILETABLE_SIZE)
     {
       fprintf(stderr,"FILETABLE SIZE EXCEEDED!\n");
       return 0;
     }
+    printf("8\n");
+    filetable *temp=(filetable *)malloc(sizeof(filetable));
+    printf("9\n");
+    temp->filedescriptor=fd;
+    temp->nextfiletableentry=NULL;
+    temp->currfilepointer=0;
+    temp->who=who;
+    head->nextfiletableentry=temp;
+    printf("10\n");
+    return 1;
   }
-  head->filedescriptor=fd;
-  head->nextfiletableentry=NULL;
-  head->currfilepointer=0;
-  head->who=who;
-  return 1;
+
 }
 
-int removeEntry(inode *file,pid_t who)
+int removeEntry(inode *file,int who)
 {
   filetable * curr=FileTable;
   filetable * prev=NULL;
