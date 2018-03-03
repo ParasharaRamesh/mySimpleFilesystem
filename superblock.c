@@ -28,7 +28,7 @@ int superblockInit()
 		//Setting the id for each inode with its index in the list
 		sfssuperblock->inodes[i].id=i;
 	}
-	
+
 	for(int i=0;i<TOTAL_DATABLOCKS;i++)
 	{
 		//Marking each datablock as unused by setting it to 0

@@ -7,15 +7,11 @@
 #define FILETABLE_SIZE 20
 #define MAX_CONTENT_LIMIT 100
 
-//Locations for disk write/read
-#define L_SUPERBLOCK
-#define L_INODES 
-#define L_DATABLOCKS 
-#define L_FILETABLE
 
 #include <sys/time.h>
 #include <pthread.h>
 
+char *disk="PersistantDisk.txt";
 int currentshellpid;
 //this is the shell workaround we have to modify the code to only pass this to all functions
 // and also we gotta include an additional command in the shell called
@@ -97,7 +93,7 @@ int currentshellpid;
           inode *inodes;
           int *datablocklist;
           datablock *datablocks;
-          
+
       }superblock;
 
       //superblock of the fs
@@ -108,7 +104,19 @@ int currentshellpid;
       inode *getInode();
       datablock *getDatablock();
       int superblockDestroy();
+//DUMPFS related
+int diskWrite(superblock *sfssuperblock,filetable *FileTable,char *disk);
+
+//AUTOMOUNT related
+superblock *superblockDiskRead(char *disk);
+filetable *filetableDiskRead(char *disk);
+
+//Locations for disk write/read
+int L_SUPERBLOCK=0;
+int L_FILETABLE=64*(sizeof(inode)+sizeof(datablock)+2*sizeof(int))+2*(sizeof(int))+20;//20 is extra hole size
 
 
+int automount();
+int dumpfs();
 
 #endif

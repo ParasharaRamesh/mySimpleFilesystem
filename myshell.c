@@ -11,8 +11,23 @@ extern int currentshellpid;
 
 int main()
 {
+	int choice;
+	printf("Do you want to load the previous filesystem state?(1 for yes ,0 for no)\n");
+	scanf("%d",&choice);
+	if(choice==1)
+	{
+		if(automount())
+		{
+			printf("loaded previous Successfully!\n");
+		}
+		else
+		{
+			printf("loading failed!\n");
+			exit(0);
+		}
+	}
 	currentshellpid=getpid();
-	printf("current shell pid is %d\n",currentshellpid);
+	printf("\n\ncurrent shell pid is %d\n\n",currentshellpid);
 	char *command=NULL;
 	char *otherpartofinput=NULL;
 	char input[50];
@@ -29,7 +44,16 @@ int main()
 		scanf("%[^\n]%*c", input);
 		if(strcmp(input,"quit")==0)
 		{
-			exit(0);//eventually dumpfs from here!
+			if(dumpfs())
+			{
+				printf("saved the current state for persistence!\n");
+				exit(0);
+			}
+			else
+			{
+				printf("ERROR:could'nt save the current state\n");
+				exit(0);//eventually dumpfs from here!
+			}
 		}
 
 		command=getCommandFromInput(input);
@@ -114,7 +138,7 @@ int main()
 
 		else if(strstr(command,"write")==command)
 		{
-printf("current shell pid is %d\n",currentshellpid);
+			printf("current shell pid is %d\n",currentshellpid);
 			char ** tokens =split(input,3);
 			char * name= tokens[1];
 			char * content =(char *)malloc(sizeof(char)*MAX_CONTENT_LIMIT);

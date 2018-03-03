@@ -4,7 +4,6 @@
 #include "globalConstants.h"
 #include <unistd.h>
 
-superblock *superblockDiskRead(char *disk);
-filetable *filetableDiskRead(char *disk);
+
 
 #endif

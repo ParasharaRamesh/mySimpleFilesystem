@@ -4,7 +4,9 @@
 extern inode *root;
 extern inode * currdirectory;
 extern filetable *FileTable;
+extern superblock *sfssuperblock;//new
 extern int currentshellpid;
+
 //myshell uttility functions
 void printSupportedCommands()
 {
