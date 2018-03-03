@@ -14,8 +14,8 @@ void mkfs()
 
 int sfscreate(char * name)
 {
-    //first get a free inode and then allocate the necessary inode parameters 
-    //and set parent to currpointer 
+    //first get a free inode and then allocate the necessary inode parameters
+    //and set parent to currpointer
     //and return error if currdirectory already has max directory entries
     return createInode(name,"file");
 }
@@ -148,6 +148,7 @@ char *sfsread(char *filename,int who,int nbytes)
     printf("5\n");
     int currfilepointer=entry->currfilepointer;
     int filesize=getSizeOfFile(file);
+    printf("filesize now is :%d\n",filesize);
     if(nbytes>filesize)
     {
       printf("6\n");
@@ -156,6 +157,7 @@ char *sfsread(char *filename,int who,int nbytes)
     }
     printf("7\n");
     char *content = readDataBlocks(file);
+    // printf("from readDataBlocks is :--%s--",content);
     printf("8\n");
     char *toreturn=(char *)malloc(sizeof(char)*nbytes);
     for(int i=0;i<nbytes;i++)
@@ -163,7 +165,7 @@ char *sfsread(char *filename,int who,int nbytes)
       toreturn[i]=content[currfilepointer+i];
     }
     //strncpy(toreturn,&content[currfilepointer],nbytes);
-    printf("\t\tread thing is %s\n",toreturn);
+    //printf("\t\tread thing is %s\n",toreturn);
     return toreturn;
   }
 

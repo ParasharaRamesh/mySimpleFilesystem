@@ -5,9 +5,11 @@
 #include<stdlib.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include "globalConstants.h"
 
 //purpose of this file is to mimic the shell and support the following commands and call the appropriate handlers
 extern int currentshellpid;
+extern superblock *sfssuperblock;
 
 int main()
 {
@@ -25,6 +27,10 @@ int main()
 			printf("loading failed!\n");
 			exit(0);
 		}
+	}
+	else
+	{
+		printf("continuing as normal!\n");
 	}
 	currentshellpid=getpid();
 	printf("\n\ncurrent shell pid is %d\n\n",currentshellpid);
@@ -150,9 +156,9 @@ int main()
 			{
 				printf("cant open this file!\n");
 			}
-			printf("shaa\n");
+			//printf("shaa\n");
 			showFileTableContents();//debug line
-			printf("shaa\n");
+			//printf("shaa\n");
 			if(!sfswrite(name,currentshellpid,content))
 			{
 				printf("cant write into this file!\n");
@@ -176,11 +182,12 @@ int main()
 				printf("cant open this file!\n");
 			}
 			printf("b\n");
-			if(!sfsread(name,who,nbytes))
+			char * readstr=sfsread(name,who,nbytes);
+			if(readstr==NULL)
 			{
 				printf("cant write into this file!\n");
 			}
-			printf("c\n");
+			printf("read string is :%s\n",readstr);
 		}
 
 		else if(strstr(command,"cat")==command)
