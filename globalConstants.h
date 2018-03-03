@@ -11,7 +11,6 @@
 #include <sys/time.h>
 #include <pthread.h>
 
-char *disk="PersistantDisk.txt";
 int currentshellpid;
 //this is the shell workaround we have to modify the code to only pass this to all functions
 // and also we gotta include an additional command in the shell called
@@ -112,8 +111,8 @@ superblock *superblockDiskRead(char *disk);
 filetable *filetableDiskRead(char *disk);
 
 //Locations for disk write/read
-int L_SUPERBLOCK=0;
-int L_FILETABLE=64*(sizeof(inode)+sizeof(datablock)+2*sizeof(int))+2*(sizeof(int))+20;//20 is extra hole size
+#define L_SUPERBLOCK 0
+#define L_FILETABLE 64*(sizeof(inode)+sizeof(datablock)+2*sizeof(int))+2*(sizeof(int))+20//20 is extra hole size
 
 
 int automount();

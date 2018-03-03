@@ -1,13 +1,10 @@
 #include "globalConstants.h"
-#include "utility.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/time.h>
 
 extern filetable *FileTable;
 extern superblock *sfssuperblock;//new
-
 superblock *superblockDiskRead(char *disk)
 {
     superblock* sfssuperblock = (superblock *)malloc(sizeof(superblock));
@@ -20,7 +17,7 @@ superblock *superblockDiskRead(char *disk)
     {
         return NULL;
     }
-    if(fread(sfssuperblock , sizeof(superblock), 1 , file) != sizeof(superblock))
+    if(fread(sfssuperblock , sizeof(superblock), 1 , file) != 1)
     {
         return NULL;
     }
@@ -40,7 +37,7 @@ filetable *filetableDiskRead(char *disk)
     {
         return NULL;
     }
-    if(fread(FileTable, sizeof(filetable) , 1 , file) != sizeof(filetable))
+    if(fread(FileTable, sizeof(filetable) , 1 , file) != 1)
     {
         return NULL;
     }
@@ -50,6 +47,7 @@ filetable *filetableDiskRead(char *disk)
 
 int automount()
 {
+  char *disk="PersistantDisk.txt";
   memcpy(sfssuperblock,superblockDiskRead(disk),sizeof(superblock));
   if(sfssuperblock==NULL)
   {

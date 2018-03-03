@@ -1,14 +1,11 @@
 #include "globalConstants.h"
-#include "utility.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/time.h>
 //file must already exist
 
 extern filetable *FileTable;
 extern superblock *sfssuperblock;//new
-
 int diskWrite(superblock *sfssuperblock,filetable *FileTable,char *disk)
 {
     //before quitting the program, the superblock has to be written to the disk
@@ -50,5 +47,6 @@ int diskWrite(superblock *sfssuperblock,filetable *FileTable,char *disk)
 
 int dumpfs()
 {
+    char *disk="PersistantDisk.txt";
     return diskWrite(sfssuperblock,FileTable,disk);
 }
