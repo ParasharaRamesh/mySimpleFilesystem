@@ -14,7 +14,9 @@ void mkfs()
 
 int sfscreate(char * name)
 {
-    //first get a free inode and then allocate the necessary inode parameters and set parent to currpointer and return error if currdirectory already has max directory entries
+    //first get a free inode and then allocate the necessary inode parameters 
+    //and set parent to currpointer 
+    //and return error if currdirectory already has max directory entries
     return createInode(name,"file");
 }
 

@@ -7,6 +7,12 @@
 #define FILETABLE_SIZE 20
 #define MAX_CONTENT_LIMIT 100
 
+//Locations for disk write/read
+#define L_SUPERBLOCK
+#define L_INODES 
+#define L_DATABLOCKS 
+#define L_FILETABLE
+
 #include <sys/time.h>
 #include <pthread.h>
 
@@ -53,9 +59,9 @@ int currentshellpid;
       	struct datablock* nextdatablock;
       }datablock;
 
-      char * readDataBlocks(inode *file);
+      char *readDataBlocks(inode *file);
       //mode is 0 for overwrite 1 for append
-      datablock* writeDataBlock(char* content);
+      datablock *writeDataBlock(char* content);
       //Entire file at once
       int unlinkDataBlock(inode *file);
 
@@ -78,7 +84,7 @@ int currentshellpid;
       int addEntry(inode *file,int who);
       int removeEntry(inode *file,int who);
       int flushfiletable(inode *file);
-      filetable * getEntry(int fd, int who);
+      filetable *getEntry(int fd, int who);
 
 //SUPERBLOCK RELATED
 
@@ -91,16 +97,16 @@ int currentshellpid;
           inode *inodes;
           int *datablocklist;
           datablock *datablocks;
-
+          
       }superblock;
 
       //superblock of the fs
-    //  superblock * sfssuperblock;
+      //superblock * sfssuperblock;
 
       //functions related to superblock
       int superblockInit();
-      inode* getInode();
-      datablock* getDatablock();
+      inode *getInode();
+      datablock *getDatablock();
       int superblockDestroy();
 
 

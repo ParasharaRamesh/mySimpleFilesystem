@@ -16,6 +16,7 @@ int createInode(char * name, char * type)
     {
         return 0;
     }
+    
     if(currdirectory->noOfInodes==0)
     {
       currdirectory->inodeList=newInode;
@@ -52,6 +53,7 @@ int createInode(char * name, char * type)
 
     return 1;
 }
+
 int deleteInode(inode *entry)
 {
     if(entry->noOfInodes!=0)

@@ -17,24 +17,24 @@ int superblockInit()
     sfssuperblock->datablocks = (datablock *)malloc(sizeof(datablock)*TOTAL_DATABLOCKS);
     sfssuperblock->inodelist=(int *)malloc(sizeof(int)*TOTAL_INODES);
     sfssuperblock->datablocklist=(int *)malloc(sizeof(int)*TOTAL_DATABLOCKS);
-		if(sfssuperblock->inodes == NULL || sfssuperblock->datablocks==NULL)
+	if(sfssuperblock->inodes == NULL || sfssuperblock->datablocks==NULL)
     {
     	return 0;
-		}
-		for(int i=0;i<TOTAL_INODES;i++)
-		{
-			//0 if the inode is not used,1 if the inode is used.
-			sfssuperblock->inodelist[i]=0;
-			//Setting the id for each inode with its index in the list
-			sfssuperblock->inodes[i].id=i;
-		}
-
-		for(int i=0;i<TOTAL_DATABLOCKS;i++)
-		{
-			//Marking each datablock as unused by setting it to 0
-			//0 means unused 1 means used
-			sfssuperblock->datablocklist[i]=0;
-		}
+	}
+	for(int i=0;i<TOTAL_INODES;i++)
+	{
+		//0 if the inode is not used,1 if the inode is used.
+		sfssuperblock->inodelist[i]=0;
+		//Setting the id for each inode with its index in the list
+		sfssuperblock->inodes[i].id=i;
+	}
+	
+	for(int i=0;i<TOTAL_DATABLOCKS;i++)
+	{
+		//Marking each datablock as unused by setting it to 0
+		//0 means unused 1 means used
+		sfssuperblock->datablocklist[i]=0;
+	}
 
   //Creating the root directory
   sfssuperblock->inodelist[0]=1;
@@ -51,7 +51,7 @@ int superblockInit()
   root->parent=NULL;//Root directory has no parent
   root->fdcount=0;
   currdirectory=&sfssuperblock->inodes[0];//Setting the currentdirectory to root
-	return 1;
+  return 1;
 }
 
 
@@ -65,12 +65,12 @@ inode* getInode()
 			{
 				//Finding the smallest unused inode
 				sfssuperblock->no_of_free_inodes--;
-        sfssuperblock->inodelist[i]=1;
-        sfssuperblock->inodes[i].nextdirentry=NULL;
-        sfssuperblock->inodes[i].noOfInodes=0;
-        sfssuperblock->inodes[i].inodeList=NULL;
-        sfssuperblock->inodes[i].datablocksarray=NULL;
-        sfssuperblock->inodes[i].noOfDatablocks=0;
+        		sfssuperblock->inodelist[i]=1;
+        		sfssuperblock->inodes[i].nextdirentry=NULL;
+        		sfssuperblock->inodes[i].noOfInodes=0;
+        		sfssuperblock->inodes[i].inodeList=NULL;
+        		sfssuperblock->inodes[i].datablocksarray=NULL;
+        		sfssuperblock->inodes[i].noOfDatablocks=0;
 				return &sfssuperblock->inodes[i];
 			}
 		}
@@ -93,10 +93,10 @@ datablock* getDatablock()
 			{
 				//Finding the smallest unused datablock
 				sfssuperblock->no_of_free_datablocks--;
-        sfssuperblock->datablocklist[i]=1;
-        sfssuperblock->datablocks[i].nextdatablock=NULL;
-        memset(sfssuperblock->datablocks[i].data,0,sizeof(sfssuperblock->datablocks[i].data));
-        sfssuperblock->datablocks[i].currsize=0;
+        		sfssuperblock->datablocklist[i]=1;
+        		sfssuperblock->datablocks[i].nextdatablock=NULL;
+        		memset(sfssuperblock->datablocks[i].data,0,sizeof(sfssuperblock->datablocks[i].data));
+        		sfssuperblock->datablocks[i].currsize=0;
 				return &sfssuperblock->datablocks[i];
 			}
 		}
