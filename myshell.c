@@ -16,7 +16,7 @@ int main()
 	int choice;
 	printf("Do you want to load the previous filesystem state?(1 for yes ,0 for no)\n");
 	scanf("%d",&choice);
-	if(choice==1)
+	if(choice == 1)
 	{
 		if(automount())
 		{
@@ -28,7 +28,7 @@ int main()
 			exit(0);
 		}
 	}
-	else
+	else if(choice == 0)
 	{
 		printf("continuing as normal!\n");
 	}

@@ -48,18 +48,19 @@ filetable *filetableDiskRead(char *disk)
 int automount()
 {
   char *disk="PersistantDisk.txt";
-  memcpy(sfssuperblock,superblockDiskRead(disk),sizeof(superblock));
+  //memcpy(sfssuperblock,superblockDiskRead(disk),sizeof(superblock));
+  sfssuperblock = superblockDiskRead(disk);
   if(sfssuperblock==NULL)
   {
     printf("automouting failed (1)!\n");
     return 0;
   }
-  memcpy(FileTable,filetableDiskRead(disk),sizeof(filetable));
+  //memcpy(FileTable,filetableDiskRead(disk),sizeof(filetable));
+  FileTable = filetableDiskRead(disk);
   if(FileTable==NULL)
   {
     printf("automouting failed (2)!\n");
     return 0;
   }
   return 1;
-
 }
