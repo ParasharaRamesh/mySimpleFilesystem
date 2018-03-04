@@ -112,7 +112,8 @@ filetable *filetableDiskRead(char *disk);
 
 //Locations for disk write/read
 #define L_SUPERBLOCK 0
-#define L_FILETABLE 64*(sizeof(inode)+sizeof(datablock)+2*sizeof(int))+2*(sizeof(int))+20//20 is extra hole size
+#define L_FILETABLE (64 * (sizeof(inode)+sizeof(datablock)+2*sizeof(int)) + 2 * (sizeof(int)) + 20)
+//20 is extra hole size
 
 
 int automount();

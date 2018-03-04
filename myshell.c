@@ -35,7 +35,11 @@ int main()
 		//take continous input and switch case each of the supoorted functions
 
 		printf("%s",prompt);
-		scanf("%[^\n]%*c", input);
+		//scanf("%[^\n]%*c", input);
+		//fgets(input, 50, stdin);
+		//printf("\nInput: %s",input);
+		//input[strlen(input)] = '\n';
+		gets(input);
 		if(strcmp(input,"quit")==0)
 		{
 			if(dumpfs())

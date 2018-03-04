@@ -5,6 +5,7 @@
 
 extern filetable *FileTable;
 extern superblock *sfssuperblock;//new
+extern inode *currdirectory;
 superblock *superblockDiskRead(char *disk)
 {
     superblock* sfssuperblock = (superblock *)malloc(sizeof(superblock));
@@ -62,5 +63,6 @@ int automount()
     printf("automouting failed (2)!\n");
     return 0;
   }
+  currdirectory=&sfssuperblock->inodes[0];
   return 1;
 }
