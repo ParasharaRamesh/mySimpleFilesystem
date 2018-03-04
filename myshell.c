@@ -16,32 +16,20 @@ int main()
 	int choice;
 	printf("Do you want to load the previous filesystem state?(1 for yes ,0 for no)\n");
 	scanf("%d",&choice);
-	if(choice == 1)
-	{
-		if(automount())
-		{
-			printf("loaded previous Successfully!\n");
-		}
-		else
-		{
-			printf("loading failed!\n");
-			exit(0);
-		}
-	}
-	else if(choice == 0)
-	{
-		printf("continuing as normal!\n");
-	}
 	currentshellpid=getpid();
 	printf("\n\ncurrent shell pid is %d\n\n",currentshellpid);
 	char *command=NULL;
 	char *otherpartofinput=NULL;
 	char input[50];
 	char prompt[3]=">>\0";//print this every line as the prompt of our shell
+	if(!mkfs(choice))
+	{
+		printf("mkfs failed!\n");
+		exit(0);
+	}
 	printf("Welcome to Simple FileSystem\n");
 	printSupportedCommands();
 
-	mkfs();
 	while(1)
 	{
 		//take continous input and switch case each of the supoorted functions

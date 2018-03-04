@@ -7,9 +7,35 @@ extern inode * root;
 extern filetable * FileTable;
 extern int currentshellpid;
 
-void mkfs()
+int mkfs(int mount)
 {
-  superblockInit();
+  if(mount==1)
+  {
+    if(automount())
+    {
+      printf("Successfully automounted!\n");
+      return 1;
+    }
+    else
+    {
+      printf("autmount failed !\n");
+      return 0;
+    }
+  }
+  else
+  {
+      if(superblockInit())
+      {
+        printf("superblockInit sucess!\n");
+        return 1;
+      }
+      else
+      {
+        printf("superblockInit failed!\n");
+        return 0;
+      }
+  }
+
 }
 
 int sfscreate(char * name)

@@ -13,7 +13,7 @@
 
 
 //1 for sucess 0 for failure
-void mkfs();
+int mkfs(int mount);
 //working
 int sfscreate(char * name);
 int sfsmkdir(char * name);
