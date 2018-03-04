@@ -33,13 +33,12 @@ int main()
 	while(1)
 	{
 		//take continous input and switch case each of the supoorted functions
-
+		//printf("A\n");
 		printf("%s",prompt);
-		//scanf("%[^\n]%*c", input);
-		//fgets(input, 50, stdin);
-		//printf("\nInput: %s",input);
-		//input[strlen(input)] = '\n';
+		//scanf("%s", input);
 		gets(input);
+		//printf("input is %s and length is %d",input,strlen(input));
+		//printf("B\n");
 		if(strcmp(input,"quit")==0)
 		{
 			if(dumpfs())
@@ -53,12 +52,12 @@ int main()
 				exit(0);//eventually dumpfs from here!
 			}
 		}
-
+		//printf("C\n");
 		command=getCommandFromInput(input);
-
+		//printf("D\n");
 		if(strcmp(command,"touch")==0)
 		{
-			printf("current shell pid is %d\n",currentshellpid);
+			//printf("current shell pid is %d\n",currentshellpid);
 			otherpartofinput=getOtherPartFromInput(input);
 			if(!sfscreate(otherpartofinput))
 			{
@@ -68,11 +67,11 @@ int main()
 		}
 		else if(strcmp(command,"switch")==0)
 		{
-			printf("1\n");
+			//printf("1\n");
 			char **tokens=split(input,2);
-			printf("2\n");
+			//printf("2\n");
 			int pid=atoi(tokens[1]);
-			printf("%d\n",pid);
+			//printf("%d\n",pid);
 			currentshellpid=pid;
 			printf("currentshellpid is changed %d\n",currentshellpid);
 		}
@@ -226,6 +225,7 @@ int main()
 			showFileTableContents();//debug line
 		}
 		//all other commands in elseif ladder c doesnt support switch for strings :(
+		//printf("E\n");
 		command="";
 		otherpartofinput="";
 	}

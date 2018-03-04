@@ -6,6 +6,7 @@
 
 extern filetable *FileTable;
 extern superblock *sfssuperblock;//new
+extern inode * currdirectory;//one for root
 int diskWrite(superblock *sfssuperblock,filetable *FileTable,char *disk)
 {
     //before quitting the program, the superblock has to be written to the disk

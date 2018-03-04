@@ -1,11 +1,13 @@
 #include "globalConstants.h"
+#include "utility.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 extern filetable *FileTable;
 extern superblock *sfssuperblock;//new
-extern inode *currdirectory;
+extern inode * currdirectory;//one for root
+
 superblock *superblockDiskRead(char *disk)
 {
     superblock* sfssuperblock = (superblock *)malloc(sizeof(superblock));
@@ -34,7 +36,7 @@ filetable *filetableDiskRead(char *disk)
     {
         return NULL;
     }
-    if(fseek( file , L_SUPERBLOCK , SEEK_SET) != 0 )
+    if(fseek( file , L_FILETABLE , SEEK_SET) != 0 )
     {
         return NULL;
     }
@@ -63,6 +65,20 @@ int automount()
     printf("automouting failed (2)!\n");
     return 0;
   }
-  currdirectory=&sfssuperblock->inodes[0];
+  inode *root=&sfssuperblock->inodes[0];
+  currdirectory=root;
+  printf("previous currdirectory assigned!\n");
+  printf("name of current directory is %s\n",currdirectory->name);
+  printf("%d\t%d\n",sfssuperblock->no_of_free_inodes,sfssuperblock->no_of_free_datablocks);
+  if(FileTable==NULL)
+  {
+    printf("yeah bro its supposed to be null!\n");
+  }
+  else
+  {
+    printf("looks like something is there!\n");
+    printf("\t-->filedescriptor:%d\tprocess_id:%d\tcurrfilepointer:%d\n",FileTable->filedescriptor,FileTable->who,FileTable->currfilepointer);
+  }
+  //showFileTableContents();
   return 1;
 }
