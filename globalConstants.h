@@ -104,7 +104,9 @@ int currentshellpid;
       datablock *getDatablock();
       int superblockDestroy();
 //DUMPFS related
-int diskWrite(superblock *sfssuperblock,filetable *FileTable,char *disk);
+//int diskWrite(superblock *sfssuperblock,filetable *FileTable,char *disk);
+int superblockWrite(superblock *sfssuperblock,char *disk);
+int filetableWrite(filetable *FileTable,char *disk);
 
 //AUTOMOUNT related
 superblock *superblockDiskRead(char *disk);
@@ -112,8 +114,7 @@ filetable *filetableDiskRead(char *disk);
 
 //Locations for disk write/read
 #define L_SUPERBLOCK 0
-#define L_FILETABLE (64 * (sizeof(inode)+sizeof(datablock)+2*sizeof(int)) + 2 * (sizeof(int)) + 20)
-//20 is extra hole size
+#define L_FILETABLE 64*(sizeof(inode)+sizeof(datablock)+2*sizeof(int))+2*(sizeof(int))//20 is extra hole size
 
 
 int automount();

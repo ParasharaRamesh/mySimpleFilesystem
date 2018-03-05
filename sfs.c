@@ -250,7 +250,15 @@ int sfswrite(char *filename,int who,char *content)
     //then we make sure the currfilepointer is updated and the datablocks are linked
     printf("3\n");
     int contentlen=strlen(blockcontent);
-    int noofblocksreq=(int)(floor(((double)contentlen)/DATABLOCK_SIZE))+1;//dont know how to get floor so rewrite correctly
+    int noofblocksreq;
+    if((contentlen/DATABLOCK_SIZE)==1)
+    {
+      noofblocksreq=1;
+    }
+    else
+    {
+      noofblocksreq=(int)(floor(((double)contentlen)/DATABLOCK_SIZE))+1;//dont know how to get floor so rewrite correctly
+    }
     printf("the no of blocks required for the first time writing is --%d--\n",noofblocksreq);
     char * currblockcontent=(char *)malloc(sizeof(char)*DATABLOCK_SIZE);
     strncpy(currblockcontent,blockcontent,DATABLOCK_SIZE);

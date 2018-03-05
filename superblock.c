@@ -6,7 +6,7 @@
 inode * root;
 //curr directory
 inode * currdirectory;//one for root
-superblock *sfssuperblock;
+superblock *sfssuperblock=NULL;
 
 int superblockInit()
 {
