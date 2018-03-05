@@ -1,0 +1,12 @@
+
+
+touch a
+ls
+
+ls
+touch b
+ls
+mkdir c
+ls
+
+ls

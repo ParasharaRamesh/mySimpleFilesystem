@@ -7,15 +7,26 @@
 #include <unistd.h>
 #include "globalConstants.h"
 
-//purpose of this file is to mimic the shell and support the following commands and call the appropriate handlers
+//purpose of this file is to mimic the shell 
+//and support the following commands and call the appropriate handlers
 extern int currentshellpid;
 extern superblock *sfssuperblock;
 
 int main()
 {
 	int choice;
+	char *disk = "PersistentDisk.txt";
+	FILE *file;
 	printf("Do you want to load the previous filesystem state?(1 for yes ,0 for no)\n");
 	scanf("%d",&choice);
+	if(choice == 0)
+	{
+		file = fopen(disk,"w+"); //creates fresh file
+	}
+	else if(choice == 1)
+	{
+		file = fopen(disk,"r+"); //appends to file
+	}
 	currentshellpid=getpid();
 	printf("\n\ncurrent shell pid is %d\n\n",currentshellpid);
 	char *command=NULL;
@@ -25,6 +36,11 @@ int main()
 	if(!mkfs(choice))
 	{
 		printf("mkfs failed!\n");
+		exit(0);
+	}
+	if( fseek(file,0,SEEK_END) != 0)
+	{
+		printf("Fseek Failed\n");
 		exit(0);
 	}
 	printf("Welcome to Simple FileSystem\n");
@@ -40,19 +56,18 @@ int main()
 		//printf("\nInput: %s",input);
 		//input[strlen(input)] = '\n';
 		gets(input);
+
 		if(strcmp(input,"quit")==0)
 		{
-			if(dumpfs())
-			{
-				printf("saved the current state for persistence!\n");
-				exit(0);
-			}
-			else
-			{
-				printf("ERROR:could'nt save the current state\n");
-				exit(0);//eventually dumpfs from here!
-			}
+			printf("Successfully saved the current state\n");
+			exit(0);
 		}
+
+		if( fwrite("\n",1,1,file) != 1)
+		{
+			printf("Write into file failed\n");
+		}
+		fwrite(input,strlen(input),1,file);
 
 		command=getCommandFromInput(input);
 
@@ -143,6 +158,15 @@ int main()
 			printf("enter the content you want to write into this file\n");
 			//fgets(content, MAX_CONTENT_LIMIT, stdin);
 			scanf("%[^\n]%*c",content);
+			strcat(content,"\n");
+			if( fwrite("\n",1,1,file) != 1)
+			{
+				printf("Write into file failed\n");
+			}
+			if( fwrite(content,strlen(content),1,file) != 1)
+			{
+				printf("Write into file failed\n");
+			}
 			//printf("here%s,%s,%d\n",name,content);
 			if(!sfsopen(name,currentshellpid))
 			{
