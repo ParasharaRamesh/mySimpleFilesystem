@@ -32,7 +32,7 @@ int main()
 	char *command=NULL;
 	char *otherpartofinput=NULL;
 	char input[50];
-	char prompt[3]=">>\0";//print this every line as the prompt of our shell
+	char prompt[3]=">>\0"; //print this every line as the prompt of our shell
 	if(!mkfs(choice))
 	{
 		printf("mkfs failed!\n");
@@ -53,12 +53,6 @@ int main()
 		printf("%s",prompt);
 		//scanf("%s", input);
 		gets(input);
-<<<<<<< HEAD
-
-=======
-		//printf("input is %s and length is %d",input,strlen(input));
-		//printf("B\n");
->>>>>>> b512ff022842b8fb807261ed6a83b895a056d856
 		if(strcmp(input,"quit")==0)
 		{
 			printf("Successfully saved the current state\n");
@@ -69,12 +63,8 @@ int main()
 		{
 			printf("Write into file failed\n");
 		}
-<<<<<<< HEAD
 		fwrite(input,strlen(input),1,file);
 
-=======
-		//printf("C\n");
->>>>>>> b512ff022842b8fb807261ed6a83b895a056d856
 		command=getCommandFromInput(input);
 		//printf("D\n");
 		if(strcmp(command,"touch")==0)

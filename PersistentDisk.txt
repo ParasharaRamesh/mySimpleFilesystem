@@ -2,11 +2,21 @@
 
 touch a
 ls
-
-ls
 touch b
 ls
 mkdir c
+ls
+
+ls
+touch e
+ls
+mkdir m
+ls
+
+ls
+touch m
+ls
+mkdir abc
 ls
 
 ls

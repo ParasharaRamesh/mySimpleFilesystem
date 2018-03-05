@@ -6,7 +6,6 @@
 #include<sys/time.h>
 #include<unistd.h>
 #include "globalConstants.h"
-<<<<<<< HEAD
 
 int automount()
 {
@@ -125,18 +124,6 @@ int automount()
 //extern superblock *sfssuperblock;//new
 //extern inode *currdirectory;
 /*superblock *superblockDiskRead(char *disk)
-=======
-#include "utility.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-extern filetable *FileTable;
-extern superblock *sfssuperblock;//new
-extern inode * currdirectory;//one for root
-
-superblock *superblockDiskRead(char *disk)
->>>>>>> b512ff022842b8fb807261ed6a83b895a056d856
 {
     superblock* sfssuperblock = (superblock *)malloc(sizeof(superblock));
     FILE *file = fopen(disk, "rb");
@@ -194,26 +181,6 @@ int automount()
     printf("automouting failed (2)!\n");
     return 0;
   }
-<<<<<<< HEAD
   currdirectory=&sfssuperblock->inodes[0];
   return 1; 
 } */
-=======
-  inode *root=&sfssuperblock->inodes[0];
-  currdirectory=root;
-  printf("previous currdirectory assigned!\n");
-  printf("name of current directory is %s\n",currdirectory->name);
-  printf("%d\t%d\n",sfssuperblock->no_of_free_inodes,sfssuperblock->no_of_free_datablocks);
-  if(FileTable==NULL)
-  {
-    printf("yeah bro its supposed to be null!\n");
-  }
-  else
-  {
-    printf("looks like something is there!\n");
-    printf("\t-->filedescriptor:%d\tprocess_id:%d\tcurrfilepointer:%d\n",FileTable->filedescriptor,FileTable->who,FileTable->currfilepointer);
-  }
-  //showFileTableContents();
-  return 1;
-}
->>>>>>> b512ff022842b8fb807261ed6a83b895a056d856
