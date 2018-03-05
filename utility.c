@@ -164,3 +164,33 @@ int getSizeOfFile(inode * file)
 //automount utility functions
 
 //dumpfs utility functions
+void plog(FILE * file,char *input,char *content,int mode)
+{
+  if(mode==0)//for all other cases
+  {
+    if( fwrite("\n",1,1,file) != 1)
+    {
+      printf("Write into file failed\n");
+    }
+    fwrite(input,strlen(input),1,file);
+  }
+  else if(mode==1)//only for write case
+  {
+    if( fwrite("\n",1,1,file) != 1)
+    {
+      printf("Write into file failed\n");
+    }
+    if( fwrite(input,strlen(input),1,file) != 1)
+    {
+      printf("Write into file failed\n");
+    }
+    if( fwrite(" ",1,1,file) != 1)//all the content is after a space
+    {
+      printf("Write into file failed\n");
+    }
+    if( fwrite(content,strlen(content),1,file) != 1)
+    {
+      printf("Write into file failed\n");
+    }
+  }
+}

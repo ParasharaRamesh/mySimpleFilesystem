@@ -33,4 +33,5 @@ int getSizeOfFile(inode * file);
 //automount utility functions
 
 //dumpfs utility functions
+void plog(FILE * file,char *input,char *content,int mode);
 #endif

@@ -7,13 +7,14 @@
 #include <unistd.h>
 #include "globalConstants.h"
 
-//purpose of this file is to mimic the shell 
+//purpose of this file is to mimic the shell
 //and support the following commands and call the appropriate handlers
 extern int currentshellpid;
 extern superblock *sfssuperblock;
 
 int main()
 {
+	int i=0;
 	int choice;
 	char *disk = "PersistentDisk.txt";
 	FILE *file;
@@ -59,11 +60,11 @@ int main()
 			exit(0);
 		}
 
-		if( fwrite("\n",1,1,file) != 1)
-		{
-			printf("Write into file failed\n");
-		}
-		fwrite(input,strlen(input),1,file);
+		// if( fwrite("\n",1,1,file) != 1)
+		// {
+		// 	printf("Write into file failed\n");
+		// }
+		// fwrite(input,strlen(input),1,file);
 
 		command=getCommandFromInput(input);
 		//printf("D\n");
@@ -75,7 +76,7 @@ int main()
 			{
 					printf("cannot create a file!!\n");
 			}
-
+			plog(file,input,NULL,0);
 		}
 		else if(strcmp(command,"switch")==0)
 		{
@@ -86,6 +87,7 @@ int main()
 			//printf("%d\n",pid);
 			currentshellpid=pid;
 			printf("currentshellpid is changed %d\n",currentshellpid);
+			plog(file,input,NULL,0);
 		}
 		else if(strcmp(input,"ls")==0)
 		{
@@ -105,6 +107,7 @@ int main()
 			{
 				printf("cant create a directory!!\n");
 			}
+			plog(file,input,NULL,0);
 		}
 		else if(strcmp(command,"cd")==0)
 		{
@@ -114,14 +117,17 @@ int main()
 			{
 				printf("cant create a directory!!\n");
 			}
+			plog(file,input,NULL,0);
 		}
 		else if(strcmp(command,"rmdir")==0)
 		{
 			printf("current shell pid is %d\n",currentshellpid);
 				otherpartofinput=getOtherPartFromInput(input);
 				if(!sfsrmdir(otherpartofinput))
+				{
 					printf("Successfully deleted directory\n");
-
+				}
+				plog(file,input,NULL,0);
 		}
 		else if(strcmp(command,"rm")==0)
 		{
@@ -131,6 +137,7 @@ int main()
 				{
 					printf("cant delete this file!!\n");
 				}
+				plog(file,input,NULL,0);
 		}
 
 		else if(strcmp(command,"close")==0)
@@ -143,26 +150,20 @@ int main()
 					printf("cant close this file!!\n");
 				}
 				showFileTableContents();//debugline
+				plog(file,input,NULL,0);
 		}
 
 		else if(strstr(command,"write")==command)
 		{
 			printf("current shell pid is %d\n",currentshellpid);
-			char ** tokens =split(input,3);
-			char * name= tokens[1];
 			char * content =(char *)malloc(sizeof(char)*MAX_CONTENT_LIMIT);
 			printf("enter the content you want to write into this file\n");
 			//fgets(content, MAX_CONTENT_LIMIT, stdin);
 			scanf("%[^\n]%*c",content);
+			plog(file,input,content,1);
+			char ** tokens =split(input,2);
+			char * name= tokens[1];
 			strcat(content,"\n");
-			if( fwrite("\n",1,1,file) != 1)
-			{
-				printf("Write into file failed\n");
-			}
-			if( fwrite(content,strlen(content),1,file) != 1)
-			{
-				printf("Write into file failed\n");
-			}
 			//printf("here%s,%s,%d\n",name,content);
 			if(!sfsopen(name,currentshellpid))
 			{
@@ -234,6 +235,7 @@ int main()
 		else if(strstr(command,"lseek")==command)
 		{
 			printf("current shell pid is %d\n",currentshellpid);
+			plog(file,input,NULL,0);
 			char ** tokens =split(input,3);
 			char *filename=tokens[1];
 			int offset=atoi(tokens[2]);
@@ -245,10 +247,16 @@ int main()
 			}
 			showFileTableContents();//debug line
 		}
+
+		else if(i>0)
+		{
+			printf("wrong command ! please reenter the command!\n");
+		}
 		//all other commands in elseif ladder c doesnt support switch for strings :(
 		//printf("E\n");
 		command="";
 		otherpartofinput="";
+		i++;
 	}
 
 	if(command!=NULL)

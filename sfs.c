@@ -18,7 +18,7 @@ int mkfs(int mount)
      printf("Superblock Init failed\n");
      return 0;
    }
-   
+
    if(mount == 1)
    {
      if(automount())
@@ -32,7 +32,7 @@ int mkfs(int mount)
        return 0;
      }
    }
-   
+
    return 1;
 }
 
@@ -251,9 +251,9 @@ int sfswrite(char *filename,int who,char *content)
     printf("3\n");
     int contentlen=strlen(blockcontent);
     int noofblocksreq;
-    if((contentlen/DATABLOCK_SIZE)==1)
+    if((contentlen%DATABLOCK_SIZE)==0)
     {
-      noofblocksreq=1;
+      noofblocksreq=contentlen/DATABLOCK_SIZE;
     }
     else
     {
@@ -309,7 +309,7 @@ int sfswrite(char *filename,int who,char *content)
       head->nextdatablock=NULL;
       file->noOfDatablocks++;
     }
-    entry->currfilepointer=contentlen;
+    entry->currfilepointer=contentlen-1;
     printf("the current filepointer is set to --%d--\n",entry->currfilepointer);
     printf("total no of datblocks in the file now are --%d--\n",file->noOfDatablocks);
     return 1;
