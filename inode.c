@@ -16,42 +16,43 @@ int createInode(char * name, char * type)
     {
         return 0;
     }
-    
+
     if(currdirectory->noOfInodes==0)
     {
-      currdirectory->inodeList=newInode;
+      currdirectory->inodeList[0]=newInode->id;
+      currdirectory->noOfInodes++;
     }
     //Else append the newInode to the end of the inodeList
     else
     {
-      inode *temp=currdirectory->inodeList;
-
-      while(temp->nextdirentry!=NULL)
+      //inode *temp=currdirectory->inodeList;
+      int i=0;
+      while(currdirectory->inodeList[i]!=-1)
       {
-        if( strcmp(temp-> name,name)==0)
+        if( strcmp(currdirectory->inodeList[i]->name,name)==0)
         {
           return 0;
         }
-        temp=temp->nextdirentry;
+        i++;
       }
-      temp->nextdirentry=newInode;
-
+      if(i<5)
+      {
+        currdirectory->inodeList[i]=newInode->id;
+        strcpy(newInode->name,name);
+        strcpy(newInode->type,type);
+        newInode->createtime=time(0);
+        newInode->noOfDatablocks=0;
+        newInode->noOfInodes=0;
+        newInode->parent=currdirectory->id;//global
+        newInode->fdcount=0;
+        //Increasing the count of the number of inodes
+        currdirectory->noOfInodes+=1;
+        return 1;
+      }
+      return 0;
     }
 
-    strcpy(newInode->name,name);
-    strcpy(newInode->type,type);
-    newInode->createtime=time(0);
-    newInode->datablocksarray=NULL;
-    newInode->noOfDatablocks=0;
-    newInode->inodeList=NULL;
-    newInode->noOfInodes=0;
-    newInode->parent=currdirectory;//global
-    newInode->fdcount=0;
-    newInode->nextdirentry=NULL;
-    //Increasing the count of the number of inodes
-    currdirectory->noOfInodes+=1;
 
-    return 1;
 }
 
 int deleteInode(inode *entry)
@@ -60,34 +61,27 @@ int deleteInode(inode *entry)
     {
       return 0;
     }
-    inode *prev;
-    inode *temp=currdirectory->inodeList;
+    //inode *prev;
+    //inode *temp=currdirectory->inodeList;
     if(strcmp(entry->type,"file")==0)
     {
       unlinkDataBlock(entry);
     }
-    if(temp==entry)
+    for(int i=0;i<5;i++)
+    {
+      if(currdirectory->inodeList[i]==entry->id)
     {
       sfssuperblock->inodelist[entry->id]=0;
-      entry->nextdirentry=NULL;
-      currdirectory->inodeList=temp->nextdirentry;
       sfssuperblock->no_of_free_inodes++;
       currdirectory->noOfInodes--;
-    }
-    else{
-      while(temp!=entry)
+      for(int k=i;k<4;k++)
       {
-        prev=temp;
-        temp=temp->nextdirentry;
+        currdirectory->inodeList[k]=currdirectory->inodeList[k+1];
       }
-      //If there was no matching directory entry
-      if(temp==NULL)
-        return 0;
-      prev->nextdirentry=temp->nextdirentry;
-      sfssuperblock->inodelist[entry->id]=0;
-      sfssuperblock->no_of_free_inodes++;
-      currdirectory->noOfInodes--;
+      currdirectory->inodeList[4]=-1;
       return 1;
+    }
+    return 0;
     }
 
 }

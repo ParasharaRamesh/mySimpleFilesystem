@@ -4,21 +4,22 @@
 #include<string.h>
 #include<sys/time.h>
 
-filetable * FileTable=NULL;
+filetable * FileTable=(filetable *)malloc(sizeof(filetable)*5);
 
 extern int currentshellpid;
 
 filetable* getEntry(int fd,int who)
 {
   //traverse the filetable and search for the entry with file's inode id and the who and
-  filetable * head= FileTable;
-  while(head!=NULL)
+  for(int i=0;i<5;i++)
   {
-    if((head->who==who)&&(head->filedescriptor==fd))
+    if(FileTable[i]->used==1)
     {
-      return head;
+      if((FileTable[i]->who==who)&&(FileTable[i]->filedescriptor==fd))
+      {
+        return &FileTable[i];
+      }
     }
-    head=head->nextfiletableentry;
   }
   return NULL;
 }
@@ -36,84 +37,32 @@ printf("1\n");
 printf("2\n");
   int fd=file->id;
   int count=0;
-  filetable * head;
-  if(FileTable == NULL)//create the first filetable nextfiletableentry
+  for(int i=0;i<5;i++)
   {
-    printf("3\n");
-    FileTable=(filetable *)malloc(sizeof(filetable));
-    if(FileTable==NULL)
+    if(FileTable[i]->used==0)
     {
-      return 0;
+      FileTable[i]->used=1;
+      FileTable[i]->filedescriptor=fd;
+      FileTable[i]->who=who;
+      FileTable[i]->currfilepointer=0;
+      return 1;
     }
-    head=FileTable;
-    head->filedescriptor=fd;
-    head->nextfiletableentry=NULL;
-    head->currfilepointer=0;
-    head->who=who;
-    printf("4\n");
-    return 1;
   }
-  else
-  {
-    printf("5\n");
-    head=FileTable;
-    while(head->nextfiletableentry!= NULL)
-    {
-      printf("6\n");
-      count++;
-      head= head->nextfiletableentry;
-    }
-
-    printf("7\n");
-    if(count>=FILETABLE_SIZE)
-    {
-      fprintf(stderr,"FILETABLE SIZE EXCEEDED!\n");
-      return 0;
-    }
-    printf("8\n");
-    filetable *temp=(filetable *)malloc(sizeof(filetable));
-    printf("9\n");
-    temp->filedescriptor=fd;
-    temp->nextfiletableentry=NULL;
-    temp->currfilepointer=0;
-    temp->who=who;
-    head->nextfiletableentry=temp;
-    printf("10\n");
-    return 1;
-  }
-
+  return 0;
 }
 
 int removeEntry(inode *file,int who)
 {
-  filetable * curr=FileTable;
-  filetable * prev=NULL;
-  while(curr!=NULL)
+  for(int i=0;i<5;i++)
   {
-    if( (curr->filedescriptor == file->id) && (curr->who == who) )
+    if( (FileTable[i]->filedescriptor == file->id) && (FileTable[i]->who == who) )
     {
-      if(prev!=NULL)
-      {
-        prev->nextfiletableentry=curr->nextfiletableentry;
-        free(curr);
-        file->fdcount--;
-        return 1;
-      }
-      else // curr first node
-      {
-          FileTable=curr->nextfiletableentry;
-          free(curr);
-          file->fdcount--;
-          return 1;
-      }
-    }
-    else
-    {
-      prev=curr;
-      curr=curr->nextfiletableentry;
+      FileTable[i]->used=0;
+      return 1;
     }
   }
-  return 0;
+    return 0;
+
 }
 
 
@@ -121,43 +70,12 @@ int flushfiletable(inode *file)
 {
   //traverse this table and remove all the entries with the filedescriptor as this file
   int fd=file->id;
-  filetable * head= FileTable;
-  filetable * prev=NULL;
-  if(head==NULL)
+  for(int i=0;i<5;i++)
   {
-    printf("cant flush an empty filetable!\n");
-    return 0;
-  }
-  int count=0;
-  while(head!=NULL)
-  {
-    if(head->filedescriptor == fd)
+    if( FileTable[i]->filedescriptor == fd )
     {
-      if(prev!=NULL)
-      {
-        prev->nextfiletableentry=head->nextfiletableentry;
-        free(head);
-      }
-      else // curr first node
-      {
-          FileTable=head->nextfiletableentry;
-          free(head);
-      }
-      count++;
-    }
-    else
-    {
-      prev=head;
-      head=head->nextfiletableentry;
+      FileTable[i]->used=0;
     }
   }
-  if(count==0)
-  {
-    printf("this file is not open currently in the filetable!\n");
-    return 0;//it has gone through the whole table
-  }
-  else
-  {
     return 1;
-  }
 }

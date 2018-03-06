@@ -13,17 +13,16 @@ char * readDataBlocks(inode *file)
     {
         char * concatenatedResult = (char *)malloc(sizeof(char)) ;
         char  *dataBlockContent = (char *)malloc(sizeof(char)*DATABLOCK_SIZE) ;//store intermediate data
-        datablock * head=file->datablocksarray;
+        //datablock * head=file->datablocksarray;
         int currdatablocklen=0;
         int count=0;
-        while(head!=NULL)
+        while(file->datablocksarray[count]!=-1)
         {
             count++;
             strcpy(dataBlockContent , head -> data);
             currdatablocklen += strlen(dataBlockContent);
             concatenatedResult=(char *)realloc(concatenatedResult,currdatablocklen);
             strcat(concatenatedResult,dataBlockContent);
-            head = head -> nextdatablock;
         }
         file->accesstime=time(0);
         return concatenatedResult;
@@ -45,16 +44,17 @@ int unlinkDataBlock(inode *file)
 {
   if(strcmp(file -> type, "file") == 0)
   {
-    datablock* head = file -> datablocksarray;
-    if(head==NULL)
+    //datablock* head = file -> datablocksarray;
+    if(file->noOfDatablocks==0)
       return 1;
-    while( head -> nextdatablock != NULL)
+  int i=0;
+    while( file->datablocksarray[i] != -1)
     {
-      sfssuperblock -> datablocklist[head -> id] = 0;
-      head = head -> nextdatablock;
+      sfssuperblock -> datablocklist[file->datablocksarray[i].id] = 0;
+      i++;
+      file->datablocksarray[i]=-1;
     }
     file -> noOfDatablocks = 0;
-    file->datablocksarray=NULL;
     return 1;
   }
   else

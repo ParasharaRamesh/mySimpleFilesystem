@@ -124,13 +124,7 @@ int sfschangedir(char * name)
 
 int sfsreaddir()
 {
-  inode * currdir= currdirectory;
-  inode * head=currdir->inodeList;
-  if(head==NULL)
-  {
-    return 0;
-  }
-  while(head!=NULL)
+  for(int i=0;i<5 && currdirectory->inodeList[i]!=-1;i++)
   {
     if(strcmp(head->type,"file")==0)
     {

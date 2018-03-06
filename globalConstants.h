@@ -29,15 +29,14 @@ int currentshellpid;
       	//datablock ** datablockList;
       	//Making it into an integer array
       	//Each file can have a maximum of 3 datablocks
-      	struct datablock * datablocksarray;
+      	int datablocksarray[5];
       	int noOfDatablocks;
       	//if inode is a directory you can have only a maximum of 5 directory entries
-      	struct inode * inodeList;
-      	struct inode * nextdirentry;//for traversing this inodeList
+        int inodeList[5];
       	int noOfInodes;
-      	struct inode * parent;
+      	int parent;
       	int fdcount;//for no of processes accessing this
-            int n_link;
+          int n_link;
       }inode;
 
       int createInode(char * name, char * type);
@@ -51,7 +50,6 @@ int currentshellpid;
       	char data[DATABLOCK_SIZE];
       	//Can set this to -1 if it is the last data block
       	int currsize;
-      	struct datablock* nextdatablock;
       }datablock;
 
       char *readDataBlocks(inode *file);
@@ -64,12 +62,10 @@ int currentshellpid;
 
       typedef struct filetable
       {
-
+        int used;
       	int filedescriptor;//same as inode no for easier access
       	int who;
       	int currfilepointer;
-      	struct filetable * nextfiletableentry;
-
       }filetable;
       //pid and filedescriptor are the primary key
 

@@ -10,6 +10,8 @@ superblock *sfssuperblock=NULL;
 
 int superblockInit()
 {
+
+
     sfssuperblock=(superblock *)malloc(sizeof(superblock));
     sfssuperblock->no_of_free_datablocks = TOTAL_DATABLOCKS;
     sfssuperblock->no_of_free_inodes = TOTAL_INODES;
@@ -26,6 +28,11 @@ int superblockInit()
 		//0 if the inode is not used,1 if the inode is used.
 		sfssuperblock->inodelist[i]=0;
 		//Setting the id for each inode with its index in the list
+    for(int j=0;j<5;j++)
+    {
+      sfssuperblock->inodelist[i]->inodeList[j]=-1;
+      sfssuperblock->inodelist[i]->datablocksarray[j]=-1;
+    }
 		sfssuperblock->inodes[i].id=i;
 	}
 
@@ -44,11 +51,9 @@ int superblockInit()
   strcpy(root->type,"directory");
   root->n_link=2;
   root->createtime=time(0);
-  root->datablocksarray=NULL;
   root->noOfDatablocks=0;
-  root->inodeList=NULL;
   root->noOfInodes=0;
-  root->parent=NULL;//Root directory has no parent
+  root->parent=-1;
   root->fdcount=0;
   currdirectory=&sfssuperblock->inodes[0];//Setting the currentdirectory to root
   return 1;
@@ -66,10 +71,14 @@ inode* getInode()
 				//Finding the smallest unused inode
 				sfssuperblock->no_of_free_inodes--;
         		sfssuperblock->inodelist[i]=1;
-        		sfssuperblock->inodes[i].nextdirentry=NULL;
         		sfssuperblock->inodes[i].noOfInodes=0;
-        		sfssuperblock->inodes[i].inodeList=NULL;
-        		sfssuperblock->inodes[i].datablocksarray=NULL;
+            memset(sfssuperblock->inodes[i].name,0,sizeof(sfssuperblock->inodes[i].name));
+            memset(sfssuperblock->inodes[i].type,0,sizeof(sfssuperblock->inodes[i].type));
+            for(int j=0;j<5;j++)
+            {
+              sfssuperblock->inodes[i]->inodeList[j]=-1;
+              sfssuperblock->inodes[i]->datablocksarray[j]=-1;
+            }
         		sfssuperblock->inodes[i].noOfDatablocks=0;
 				return &sfssuperblock->inodes[i];
 			}
@@ -94,7 +103,6 @@ datablock* getDatablock()
 				//Finding the smallest unused datablock
 				sfssuperblock->no_of_free_datablocks--;
         		sfssuperblock->datablocklist[i]=1;
-        		sfssuperblock->datablocks[i].nextdatablock=NULL;
         		memset(sfssuperblock->datablocks[i].data,0,sizeof(sfssuperblock->datablocks[i].data));
         		sfssuperblock->datablocks[i].currsize=0;
 				return &sfssuperblock->datablocks[i];
