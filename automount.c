@@ -6,9 +6,9 @@
 #include<sys/time.h>
 #include<unistd.h>
 #include "globalConstants.h"
-
+/*
 extern int currentshellpid;
-extern superblock *sfssuperblock;
+extern superblock sfssuperblock;
 
 int automount()
 {
@@ -122,48 +122,52 @@ int automount()
     return 1;
 }
 
-
-//extern filetable *FileTable;
-//extern superblock *sfssuperblock;//new
-//extern inode *currdirectory;
-/*superblock *superblockDiskRead(char *disk)
+*/
+extern filetable FileTable[5];
+extern superblock sfssuperblock;//new
+extern inode *currdirectory;
+int superblockDiskRead(char *disk)
 {
-    superblock* sfssuperblock = (superblock *)malloc(sizeof(superblock));
+  //  sfssuperblock = (superblock *)malloc(sizeof(superblock));
     FILE *file = fopen(disk, "rb");
     if(file == NULL)
     {
-        return NULL;
+        return 0;
     }
     if(fseek( file , L_SUPERBLOCK , SEEK_SET) != 0 )
     {
-        return NULL;
+        return 0;
     }
-    if(fread(sfssuperblock , sizeof(superblock), 1 , file) != 1)
+    if(fread(&sfssuperblock , sizeof(superblock), 1 , file) != 1)
     {
-        return NULL;
+        return 0;
     }
     fclose(file);
-    return sfssuperblock;
+    printf("closed the file\n");
+    printf("shaata --%d\t%d",sfssuperblock.no_of_free_inodes,sfssuperblock.no_of_free_datablocks);
+    fflush(stdout); // Will now print everything in the stdout buffer
+    currdirectory=&sfssuperblock.inodes[0];
+    sfsreaddir();
+    return 1;
 }
 
-filetable *filetableDiskRead(char *disk)
+int filetableDiskRead(char *disk)
 {
-    filetable *FileTable = (filetable *)malloc(sizeof(filetable));
     FILE *file = fopen(disk, "rb");
     if(file == NULL)
     {
-        return NULL;
+        return 0;
     }
     if(fseek( file , L_FILETABLE , SEEK_SET) != 0 )
     {
-        return NULL;
+        return 0;
     }
-    if(fread(FileTable, sizeof(filetable) , 1 , file) != 1)
+    if(fread(FileTable, sizeof(filetable)*5 , 1 , file) != 1)
     {
-        return NULL;
+        return 0;
     }
     fclose(file);
-    return FileTable;
+    return 1;
 }
 
 int automount()
@@ -171,8 +175,18 @@ int automount()
     char *disk="PersistantDisk.txt";
 
   //memcpy(sfssuperblock,superblockDiskRead(disk),sizeof(superblock));
-  sfssuperblock = superblockDiskRead(disk);
-  if(sfssuperblock==NULL)
+  if(!superblockDiskRead(disk))
+  {
+    return 0;
+  }
+  if(!filetableDiskRead(disk))
+  {
+    return 0;
+  }
+  return 1;
+}
+
+/*  if(sfssuperblock==NULL)
   {
     printf("automouting failed (1)!\n");
     return 0;
@@ -184,6 +198,4 @@ int automount()
     printf("automouting failed (2)!\n");
     return 0;
   }
-  currdirectory=&sfssuperblock->inodes[0];
-  return 1;
-} */
+  currdirectory=&sfssuperblock.inodes[0]; */

@@ -4,10 +4,10 @@
 #include <string.h>
 //file must already exist
 
-extern filetable *FileTable;
-extern superblock *sfssuperblock;//new
+extern filetable FileTable[5];
+extern superblock sfssuperblock;//new
 extern inode * currdirectory;//one for root
-int diskWrite(superblock *sfssuperblock,filetable *FileTable,char *disk)
+int diskWrite(char *disk)
 {
     //before quitting the program, the superblock has to be written to the disk
     //file which has been created in makefile
@@ -26,7 +26,7 @@ int diskWrite(superblock *sfssuperblock,filetable *FileTable,char *disk)
         printf("failed to lseek for writing superblock\n");
         return 0;
     }
-    if( fwrite(sfssuperblock, sizeof(superblock), 1 , file) != 1)
+    if( fwrite(&sfssuperblock, sizeof(superblock), 1 , file) != 1)
     {
         printf("failed to write the superblock!\n");
         return 0;
@@ -37,7 +37,7 @@ int diskWrite(superblock *sfssuperblock,filetable *FileTable,char *disk)
         printf("failed to lseek for writing filetable\n");
         return 0;
     }
-    if(fwrite(FileTable, sizeof(filetable) , 1 , file) != 1)
+    if(fwrite(FileTable, sizeof(filetable)*5, 1 , file) != 1)
     {
         printf("failed to write filetable!\n");
         return 0;
@@ -49,5 +49,5 @@ int diskWrite(superblock *sfssuperblock,filetable *FileTable,char *disk)
 int dumpfs()
 {
     char *disk="PersistantDisk.txt";
-    return diskWrite(sfssuperblock,FileTable,disk);
+    return diskWrite(disk);
 }

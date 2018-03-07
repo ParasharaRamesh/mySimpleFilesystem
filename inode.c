@@ -6,21 +6,34 @@
 
 extern inode *root;
 extern inode *currdirectory;
-extern superblock *sfssuperblock;
+extern superblock sfssuperblock;
 
 int createInode(char * name, char * type)
 {
+    //printf("1\n");
     inode *newInode = getInode();//from superblock
     //If the new Inode is the first entry, make it the head.
     if(newInode==NULL)
     {
         return 0;
     }
-
+    //printf("2\n");
     if(currdirectory->noOfInodes==0)
     {
+        //printf("3\n");
+        //printf("newinode->id is %d\n",newInode->id);
       currdirectory->inodeList[0]=newInode->id;
       currdirectory->noOfInodes++;
+      strcpy(newInode->name,name);
+      strcpy(newInode->type,type);
+      newInode->createtime=time(0);
+      newInode->noOfDatablocks=0;
+      newInode->noOfInodes=0;
+      newInode->parent=currdirectory->id;//global
+      newInode->fdcount=0;
+      //Increasing the count of the number of inodes
+        //printf("4\n");
+        return 1;
     }
     //Else append the newInode to the end of the inodeList
     else
@@ -29,7 +42,7 @@ int createInode(char * name, char * type)
       int i=0;
       while(currdirectory->inodeList[i]!=-1)
       {
-        if( strcmp(currdirectory->inodeList[i]->name,name)==0)
+        if(strcmp(sfssuperblock.inodes[currdirectory->inodeList[i]].name,name)==0)
         {
           return 0;
         }
@@ -70,18 +83,17 @@ int deleteInode(inode *entry)
     for(int i=0;i<5;i++)
     {
       if(currdirectory->inodeList[i]==entry->id)
-    {
-      sfssuperblock->inodelist[entry->id]=0;
-      sfssuperblock->no_of_free_inodes++;
-      currdirectory->noOfInodes--;
-      for(int k=i;k<4;k++)
       {
-        currdirectory->inodeList[k]=currdirectory->inodeList[k+1];
+        sfssuperblock.inodelist[entry->id]=0;
+        sfssuperblock.no_of_free_inodes++;
+        currdirectory->noOfInodes--;
+        for(int k=i;k<4;k++)
+        {
+          currdirectory->inodeList[k]=currdirectory->inodeList[k+1];
+        }
+        currdirectory->inodeList[4]=-1;
+        return 1;
       }
-      currdirectory->inodeList[4]=-1;
-      return 1;
     }
     return 0;
-    }
-
 }

@@ -5,12 +5,13 @@
 #include <sys/time.h>
 
 
-extern superblock *sfssuperblock;
+extern superblock sfssuperblock;
 
 char * readDataBlocks(inode *file)
 {
     if(strcmp(file->type,"file") == 0)//only if it is a file
     {
+        printf("1\n");
         char * concatenatedResult = (char *)malloc(sizeof(char)) ;
         char  *dataBlockContent = (char *)malloc(sizeof(char)*DATABLOCK_SIZE) ;//store intermediate data
         //datablock * head=file->datablocksarray;
@@ -18,15 +19,20 @@ char * readDataBlocks(inode *file)
         int count=0;
         while(file->datablocksarray[count]!=-1)
         {
-            count++;
-            strcpy(dataBlockContent , head -> data);
+          printf("2\n");
+            strcpy(dataBlockContent , sfssuperblock.datablocks[file->datablocksarray[count]].data);
+            printf("dataBlockContent is %s\n",dataBlockContent);
             currdatablocklen += strlen(dataBlockContent);
             concatenatedResult=(char *)realloc(concatenatedResult,currdatablocklen);
             strcat(concatenatedResult,dataBlockContent);
+            printf("concatenatedResult is %s\n",concatenatedResult);
+            count++;
+            printf("3\n");
         }
         file->accesstime=time(0);
         return concatenatedResult;
     }
+    return  NULL;
 
 }
 
@@ -47,11 +53,12 @@ int unlinkDataBlock(inode *file)
     //datablock* head = file -> datablocksarray;
     if(file->noOfDatablocks==0)
       return 1;
-  int i=0;
-    while( file->datablocksarray[i] != -1)
+    int i=0;
+    for(int i=0;i<5;i++)
+    //while( file->datablocksarray[i] != -1)
     {
-      sfssuperblock -> datablocklist[file->datablocksarray[i].id] = 0;
-      i++;
+      sfssuperblock.datablocks[file->datablocksarray[i]].id = 0;//why are we doing this???
+      //i++;
       file->datablocksarray[i]=-1;
     }
     file -> noOfDatablocks = 0;

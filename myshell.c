@@ -10,7 +10,7 @@
 //purpose of this file is to mimic the shell
 //and support the following commands and call the appropriate handlers
 extern int currentshellpid;
-extern superblock *sfssuperblock;
+extern superblock sfssuperblock;
 
 int main()
 {
@@ -56,7 +56,14 @@ int main()
 		gets(input);
 		if(strcmp(input,"quit")==0)
 		{
-			printf("Successfully saved the current state\n");
+			if(!dumpfs())
+			{
+				printf("couldnt save it for persistence\n");
+			}
+			else
+			{
+				printf("Successfully saved the current state\n");
+			}
 			exit(0);
 		}
 

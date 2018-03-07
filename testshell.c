@@ -7,7 +7,7 @@
 
 //purpose of this file is to mimic the shell and support the following commands 
 //and call the appropriate handlers
-extern superblock *sfssuperblock;
+extern superblock sfssuperblock;
 int main()
 {
 	char *name="hello";

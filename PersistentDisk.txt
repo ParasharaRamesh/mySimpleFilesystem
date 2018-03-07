@@ -1,4 +1,11 @@
 
 touch a
+write a hell
 touch b
-write a hello
+write b shaata
+mkdir c
+cd c
+touch d
+switch
+write d shaaaaa
+cd ..

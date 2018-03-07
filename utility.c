@@ -3,8 +3,8 @@
 
 extern inode *root;
 extern inode * currdirectory;
-extern filetable *FileTable;
-extern superblock *sfssuperblock;//new
+extern filetable FileTable[5];
+extern superblock sfssuperblock;//new
 extern int currentshellpid;
 
 //myshell uttility functions
@@ -110,16 +110,12 @@ char * getOtherPartFromInput(char * input)
 //filesystem utility functions
 inode * getInodeFromCurrDirectory(char *name,char *type)
 {
-  inode * head= currdirectory->inodeList;
-  while(head!=NULL)
+  //inode * head= currdirectory->inodeList;
+  for(int i=0;i<5;i++)
   {
-    if(strcmp(head->name,name)==0 && strcmp(head->type,type)==0)
+    if(strcmp(sfssuperblock.inodes[currdirectory->inodeList[i]].name,name)==0 && strcmp(sfssuperblock.inodes[currdirectory->inodeList[i]].type,type)==0)
     {
-      return head;
-    }
-    else
-    {
-      head= head->nextdirentry;
+      return &sfssuperblock.inodes[currdirectory->inodeList[i]];
     }
   }
   return NULL;
@@ -130,11 +126,14 @@ inode * getInodeFromCurrDirectory(char *name,char *type)
 void showFileTableContents()
 {
   printf("\n----------Showing all the filetable entries----------\n");
-  filetable * entry=FileTable;
-  while(entry!=NULL)
+  //filetable * entry=FileTable;
+  for(int i=0;i<5;i++)
   {
-    printf("\t-->filedescriptor:%d\tprocess_id:%d\tcurrfilepointer:%d\n",entry->filedescriptor,entry->who,entry->currfilepointer);
-    entry=entry->nextfiletableentry;
+    if(FileTable[i].used==1)
+    {
+      printf("\t-->filedescriptor:%d\tprocess_id:%d\tcurrfilepointer:%d\n",FileTable[i].filedescriptor,FileTable[i].who,FileTable[i].currfilepointer);
+      //entry=entry->nextfiletableentry;
+    }
   }
   printf("-------------------------------------------------------\n");
 }
@@ -145,14 +144,11 @@ void showFileTableContents()
 int getSizeOfFile(inode * file)
 {
   int noOfDatablocks = file->noOfDatablocks;
-  datablock * head = file->datablocksarray;
-  int i=0;
   int size=0;
-  while((i<noOfDatablocks)&&(head!=NULL))
+  for(int i=0;i<noOfDatablocks;i++)//only the first i datablocks in the datablocksarray should be used
+  //while((i<noOfDatablocks)&&(head!=NULL))
   {
-    size+=head->currsize;
-    i++;
-    head=head->nextdatablock;
+    size+=sfssuperblock.datablocks[file->datablocksarray[i]].currsize;
   }
   return size;
 }

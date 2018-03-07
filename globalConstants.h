@@ -36,7 +36,7 @@ int currentshellpid;
       	int noOfInodes;
       	int parent;
       	int fdcount;//for no of processes accessing this
-          int n_link;
+        int n_link;
       }inode;
 
       int createInode(char * name, char * type);
@@ -84,10 +84,10 @@ int currentshellpid;
       {
           int no_of_free_inodes;
           int no_of_free_datablocks;
-          int *inodelist;
-          inode *inodes;
-          int *datablocklist;
-          datablock *datablocks;
+          int inodelist[TOTAL_INODES];
+          inode inodes[TOTAL_INODES];
+          int datablocklist[TOTAL_DATABLOCKS];
+          datablock datablocks[TOTAL_DATABLOCKS];
 
       }superblock;
 
@@ -98,19 +98,18 @@ int currentshellpid;
       int superblockInit();
       inode *getInode();
       datablock *getDatablock();
-      int superblockDestroy();
+      
 //DUMPFS related
-//int diskWrite(superblock *sfssuperblock,filetable *FileTable,char *disk);
-int superblockWrite(superblock *sfssuperblock,char *disk);
-int filetableWrite(filetable *FileTable,char *disk);
+int diskWrite(char *disk);
+
 
 //AUTOMOUNT related
-superblock *superblockDiskRead(char *disk);
-filetable *filetableDiskRead(char *disk);
+int superblockDiskRead(char *disk);
+int filetableDiskRead(char *disk);
 
 //Locations for disk write/read
 #define L_SUPERBLOCK 0
-#define L_FILETABLE 64*(sizeof(inode)+sizeof(datablock)+2*sizeof(int))+2*(sizeof(int))//20 is extra hole size
+#define L_FILETABLE (64*(sizeof(inode)+sizeof(datablock)+2*sizeof(int))+2*(sizeof(int)) + 100)//20 is extra hole size
 
 
 int automount();
