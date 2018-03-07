@@ -2,17 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//file must already exist
 
 extern filetable FileTable[5];
-extern superblock sfssuperblock;//new
-extern inode * currdirectory;//one for root
+extern superblock sfssuperblock;
+extern inode * currdirectory;
 int diskWrite(char *disk)
 {
-    //before quitting the program, the superblock has to be written to the disk
-    //file which has been created in makefile
-    //need to write superblock, need to write inodelist, need to write datablocklist,
-    //need to write inodes, need to write datablocks, need to write filetable
     FILE *file = fopen(disk, "w+b");
     if( file == NULL)
     {
@@ -20,8 +15,6 @@ int diskWrite(char *disk)
         return 0;
     }
     if( fseek( file , L_SUPERBLOCK , SEEK_SET) != 0 )
-    //you have just defined L_SUPERBLOCK
-    //and other things but shouldnt you have #defined it to some number??
     {
         printf("failed to lseek for writing superblock\n");
         return 0;

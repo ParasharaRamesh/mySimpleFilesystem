@@ -10,18 +10,13 @@ extern superblock sfssuperblock;
 
 int createInode(char * name, char * type)
 {
-    //printf("1\n");
     inode *newInode = getInode();//from superblock
-    //If the new Inode is the first entry, make it the head.
     if(newInode==NULL)
     {
         return 0;
     }
-    //printf("2\n");
     if(currdirectory->noOfInodes==0)
     {
-        //printf("3\n");
-        //printf("newinode->id is %d\n",newInode->id);
       currdirectory->inodeList[0]=newInode->id;
       currdirectory->noOfInodes++;
       strcpy(newInode->name,name);
@@ -29,16 +24,12 @@ int createInode(char * name, char * type)
       newInode->createtime=time(0);
       newInode->noOfDatablocks=0;
       newInode->noOfInodes=0;
-      newInode->parent=currdirectory->id;//global
+      newInode->parent=currdirectory->id;
       newInode->fdcount=0;
-      //Increasing the count of the number of inodes
-        //printf("4\n");
-        return 1;
+      return 1;
     }
-    //Else append the newInode to the end of the inodeList
     else
     {
-      //inode *temp=currdirectory->inodeList;
       int i=0;
       while(currdirectory->inodeList[i]!=-1)
       {
@@ -56,7 +47,7 @@ int createInode(char * name, char * type)
         newInode->createtime=time(0);
         newInode->noOfDatablocks=0;
         newInode->noOfInodes=0;
-        newInode->parent=currdirectory->id;//global
+        newInode->parent=currdirectory->id;
         newInode->fdcount=0;
         //Increasing the count of the number of inodes
         currdirectory->noOfInodes+=1;
@@ -74,8 +65,6 @@ int deleteInode(inode *entry)
     {
       return 0;
     }
-    //inode *prev;
-    //inode *temp=currdirectory->inodeList;
     if(strcmp(entry->type,"file")==0)
     {
       unlinkDataBlock(entry);

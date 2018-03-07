@@ -3,7 +3,7 @@
 
 #define TOTAL_INODES 64
 #define TOTAL_DATABLOCKS 64
-#define DATABLOCK_SIZE 2//was 128
+#define DATABLOCK_SIZE 2//should be 128 but 2 for debugging purposes
 #define FILETABLE_SIZE 20
 #define MAX_CONTENT_LIMIT 100
 
@@ -12,9 +12,6 @@
 #include <pthread.h>
 
 int currentshellpid;
-//this is the shell workaround we have to modify the code to only pass this to all functions
-// and also we gotta include an additional command in the shell called
-//switch <pid> which will change this value.
 
 //INODE RELATED
       typedef struct inode
@@ -26,9 +23,6 @@ int currentshellpid;
       	time_t accesstime;
       	time_t createtime;
       	time_t modifytime;
-      	//datablock ** datablockList;
-      	//Making it into an integer array
-      	//Each file can have a maximum of 3 datablocks
       	int datablocksarray[5];
       	int noOfDatablocks;
       	//if inode is a directory you can have only a maximum of 5 directory entries
@@ -48,14 +42,11 @@ int currentshellpid;
 
       	int id;
       	char data[DATABLOCK_SIZE];
-      	//Can set this to -1 if it is the last data block
       	int currsize;
       }datablock;
 
       char *readDataBlocks(inode *file);
-      //mode is 0 for overwrite 1 for append
       datablock *writeDataBlock(char* content);
-      //Entire file at once
       int unlinkDataBlock(inode *file);
 
 //FILETABLE RELATED
@@ -92,13 +83,12 @@ int currentshellpid;
       }superblock;
 
       //superblock of the fs
-      //superblock * sfssuperblock;
 
       //functions related to superblock
       int superblockInit();
       inode *getInode();
       datablock *getDatablock();
-      
+
 //DUMPFS related
 int diskWrite(char *disk);
 

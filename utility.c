@@ -4,17 +4,12 @@
 extern inode *root;
 extern inode * currdirectory;
 extern filetable FileTable[5];
-extern superblock sfssuperblock;//new
+extern superblock sfssuperblock;
 extern int currentshellpid;
 
 //myshell uttility functions
 void printSupportedCommands()
 {
-  /*
-  commands to support:
-  ls,mkdir,rmdir,cd ->,cd ->->,open,write,read,close,create,rm,lseek
-
-  */
   printf("\n");
   printf("Commands supported :\n");//write all the supported commands and its brief usage
   printf("ls     :list the current directory\n");
@@ -37,22 +32,21 @@ void printSupportedCommands()
     printf("\tUsage : read <filename> <nbytes>\n");
   printf("close  :close the file which was opened by the current terminal's process\n");
     printf("\tUsage : close <filename>\n");
+  printf("showfiletable  :show contents of the filetable\n");
+    printf("\tUsage : showfiletable\n");
+  printf("showsuperblock  :show the current status of the superblock\n");
+    printf("\tUsage : showsuperblock\n");
   printf("\n\n");
 }
 
 char ** split(char * input,int noofwords)
 {
-	//initialize 2d array
 	char **result=(char **)malloc(sizeof(char *)*noofwords);
 	char *token = strtok(input," ");
 	int i=0;
-//  printf("aaa\n");
 	while (token != NULL)
 	{
-		//printf("%s\t%d\n",token,i);
-		//append into 2d array somehow!
 		result[i]=token;
-		//printf("\t%s\n",result[i]);
 		i++;
 		token = strtok(NULL, " ");
 	}
@@ -62,13 +56,8 @@ char ** split(char * input,int noofwords)
 	}
 }
 
-
-
-
-
 char * getCommandFromInput(char * input)
 {
-    //iterate until the first space and get only the command
     int i=0;
     int endpoint=0;
     int inputlen=strlen(input);
@@ -110,7 +99,6 @@ char * getOtherPartFromInput(char * input)
 //filesystem utility functions
 inode * getInodeFromCurrDirectory(char *name,char *type)
 {
-  //inode * head= currdirectory->inodeList;
   for(int i=0;i<5;i++)
   {
     if(strcmp(sfssuperblock.inodes[currdirectory->inodeList[i]].name,name)==0 && strcmp(sfssuperblock.inodes[currdirectory->inodeList[i]].type,type)==0)
@@ -126,13 +114,11 @@ inode * getInodeFromCurrDirectory(char *name,char *type)
 void showFileTableContents()
 {
   printf("\n----------Showing all the filetable entries----------\n");
-  //filetable * entry=FileTable;
   for(int i=0;i<5;i++)
   {
     if(FileTable[i].used==1)
     {
       printf("\t-->filedescriptor:%d\tprocess_id:%d\tcurrfilepointer:%d\n",FileTable[i].filedescriptor,FileTable[i].who,FileTable[i].currfilepointer);
-      //entry=entry->nextfiletableentry;
     }
   }
   printf("-------------------------------------------------------\n");
@@ -145,8 +131,7 @@ int getSizeOfFile(inode * file)
 {
   int noOfDatablocks = file->noOfDatablocks;
   int size=0;
-  for(int i=0;i<noOfDatablocks;i++)//only the first i datablocks in the datablocksarray should be used
-  //while((i<noOfDatablocks)&&(head!=NULL))
+  for(int i=0;i<noOfDatablocks;i++)
   {
     size+=sfssuperblock.datablocks[file->datablocksarray[i]].currsize;
   }
@@ -156,37 +141,25 @@ int getSizeOfFile(inode * file)
 //datablock utility functions
 
 //superblock utility functions
-
+void showSuperBlockStatus()
+{
+  printf("\n----------------Showing superblock status------------\n");
+  int free_inodes=sfssuperblock.no_of_free_inodes;
+  int free_datablocks=sfssuperblock.no_of_free_datablocks;
+  printf("no of free inodes : %d\n",free_inodes);
+  printf("no of free datablocks : %d\n",free_datablocks);
+  printf("bitmap of inodes pool\n");
+  for(int i=0;i<TOTAL_INODES;i++)
+  {
+    printf("%d ",sfssuperblock.inodelist[i]);
+  }
+  printf("\nbitmap of datablocks pool\n");
+  for(int i=0;i<TOTAL_DATABLOCKS;i++)
+  {
+    printf("%d ",sfssuperblock.datablocklist[i]);
+  }
+  printf("\n-------------------------------------------------------\n");
+}
 //automount utility functions
 
 //dumpfs utility functions
-void plog(FILE * file,char *input,char *content,int mode)
-{
-  if(mode==0)//for all other cases
-  {
-    if( fwrite("\n",1,1,file) != 1)
-    {
-      printf("Write into file failed\n");
-    }
-    fwrite(input,strlen(input),1,file);
-  }
-  else if(mode==1)//only for write case
-  {
-    if( fwrite("\n",1,1,file) != 1)
-    {
-      printf("Write into file failed\n");
-    }
-    if( fwrite(input,strlen(input),1,file) != 1)
-    {
-      printf("Write into file failed\n");
-    }
-    if( fwrite(" ",1,1,file) != 1)//all the content is after a space
-    {
-      printf("Write into file failed\n");
-    }
-    if( fwrite(content,strlen(content),1,file) != 1)
-    {
-      printf("Write into file failed\n");
-    }
-  }
-}

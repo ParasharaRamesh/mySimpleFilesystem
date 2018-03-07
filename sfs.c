@@ -40,9 +40,6 @@ int mkfs(int mount)
 
 int sfscreate(char * name)
 {
-    //first get a free inode and then allocate the necessary inode parameters
-    //and set parent to currpointer
-    //and return error if currdirectory already has max directory entries
     return createInode(name,"file");
 }
 
@@ -50,10 +47,7 @@ int sfscreate(char * name)
 int sfsdelete(char *name)
 {
   inode *file=getInodeFromCurrDirectory(name,"file");
-  if(!flushfiletable(file))
-  {
-    printf("couldnt flush the filetable of all the rows containing this file!\n");
-  }
+  flushfiletable(file);
   if(deleteInode(file))
   {
     return 1;
@@ -66,8 +60,7 @@ int sfsdelete(char *name)
 
 int sfsopen(char * name,int who)
 {
-  inode * file= getInodeFromCurrDirectory(name,"file");
-
+    inode * file= getInodeFromCurrDirectory(name,"file");
     if(addEntry(file,who)==1)
     {
       file->fdcount++;
@@ -126,40 +119,26 @@ int sfschangedir(char * name)
 
 int sfsreaddir()
 {
-  //printf("1\n");
   for(int i=0;i<5;i++)
   {
-    //printf("2\n");
     if(currdirectory->inodeList[i]!=-1)
     {
-      //printf("3\n");
-      //printf("%s\n",sfssuperblock.inodes[currdirectory->inodeList[i]].type);
       if(strcmp(sfssuperblock.inodes[currdirectory->inodeList[i]].type,"file")==0)
       {
-        //printf("4\n");
         printf("%s -- %c\n",sfssuperblock.inodes[currdirectory->inodeList[i]].name,'F');
       }
       else if(strcmp(sfssuperblock.inodes[currdirectory->inodeList[i]].type,"directory")==0)
       {
-        //printf("5\n");
         printf("%s -- %c\n",sfssuperblock.inodes[currdirectory->inodeList[i]].name,'D');
       }
-      //printf("6\n");
     }
-    //printf("7\n");
-    //head=head->nextdirentry;
   }
   return 1;
 }
 
 char *sfsread(char *filename,int who,int nbytes)
 {
-
-  //get the inode of this filename and using the inode no and the who search the filetable and get the corresponding filetable entry
-  //from that filetable entry get the currfilepointer and read nbytes from there
-  printf("1\n");
   inode *file = getInodeFromCurrDirectory(filename,"file");
-  printf("2\n");
   if(file == NULL)
   {
     printf("cant get this file from the current directory!\n");
@@ -167,36 +146,25 @@ char *sfsread(char *filename,int who,int nbytes)
   }
   else
   {
-    printf("3\n");
     int fd= file->id;
-    printf("%d\t%d\n",fd,who);
     filetable * entry=getEntry(fd,who);
-    printf("4\n");
     if(entry==NULL)
     {
       printf("entry doesnt exist!\n");
     }
-    printf("5\n");
     int currfilepointer=entry->currfilepointer;
     int filesize=getSizeOfFile(file);
-    printf("filesize now is :%d\n",filesize);
     if(nbytes>filesize)
     {
-      printf("6\n");
       printf("cant read %d characters from this file!\n",nbytes);
       return NULL;
     }
-    printf("7\n");
     char *content = readDataBlocks(file);
-    // printf("from readDataBlocks is :--%s--",content);
-    printf("8\n");
     char *toreturn=(char *)malloc(sizeof(char)*nbytes);
     for(int i=0;i<nbytes;i++)
     {
       toreturn[i]=content[currfilepointer+i];
     }
-    //strncpy(toreturn,&content[currfilepointer],nbytes);
-    //printf("\t\tread thing is %s\n",toreturn);
     return toreturn;
   }
 
@@ -204,7 +172,6 @@ char *sfsread(char *filename,int who,int nbytes)
 
 int sfswrite(char *filename,int who,char *content)
 {
-  printf("inside %s\t%d\t%s\n",filename,who,content);
   inode *file=getInodeFromCurrDirectory(filename,"file");
   if(file==NULL)
   {
@@ -221,10 +188,8 @@ int sfswrite(char *filename,int who,char *content)
   int currfilepointer=entry->currfilepointer;
   char *blockcontent = (char *)malloc(sizeof(char) * strlen(content));
   strcpy(blockcontent, content);
-  printf("1\n");
   if(file->datablocksarray!=NULL)
   {
-    printf("2\n");
     int filesize = getSizeOfFile(file);
     blockcontent = readDataBlocks(file);
     if(!unlinkDataBlock(file))
@@ -232,7 +197,6 @@ int sfswrite(char *filename,int who,char *content)
       printf("couldnt unlink all the datablocks!\n");
       return 0;
     }
-    printf("block content is %s\n",blockcontent);
     if(currfilepointer==filesize)
     {
       blockcontent=realloc(blockcontent,filesize+length2);
@@ -240,21 +204,16 @@ int sfswrite(char *filename,int who,char *content)
     }
     else if(filesize>(currfilepointer+length2))
     {
-      //strncpy(&blockcontent[currfilepointer],content,length2+1);
       for(int i=0;i<length2-1;i++)
       {
         blockcontent[currfilepointer+i]=content[i];
-        printf("--%c--\n",blockcontent[currfilepointer+i]);
       }
-
     }
     else
     {
       blockcontent=realloc(blockcontent,currfilepointer+length2);
       strcpy(&blockcontent[currfilepointer],content);
     }
-    printf("22\n");
-    printf("block content after is %s\n",blockcontent);
   }
   for(int i=0;i<5;i++)
   {
@@ -264,152 +223,82 @@ int sfswrite(char *filename,int who,char *content)
       return 0;
     }
   }
-  printf("Successfully unlinked everything\n");
-  //if(file->datablocksarray==NUL)//first time writing
-  //{
-    //all the old code is in readme
-    //find out noofblocks required and write into it until the last but one and the last one special case you write
-    //then we make sure the currfilepointer is updated and the datablocks are linked
-    printf("3\n");
-    int contentlen=strlen(blockcontent);
-    printf("%d\n",contentlen);
-    int noofblocksreq;
-    if(((contentlen-1)%DATABLOCK_SIZE)==0)
-    {
-      noofblocksreq=(contentlen-1)/DATABLOCK_SIZE;
-    }
-    else
-    {
-      noofblocksreq=(int)(floor(((double)(contentlen-1))/DATABLOCK_SIZE))+1;//dont know how to get floor so rewrite correctly
-    }
-    printf("the no of blocks required for the first time writing is --%d--\n",noofblocksreq);
-    char * currblockcontent=(char *)malloc(sizeof(char)*DATABLOCK_SIZE);
-    strncpy(currblockcontent,blockcontent,DATABLOCK_SIZE);
-    printf("first block contains --%s-- and the len is --%ld--\n",currblockcontent,strlen(currblockcontent));
-
-    file->noOfDatablocks=noofblocksreq;
-    printf("file->noOfDatablocks=%d\n",noofblocksreq);
+  int contentlen=strlen(blockcontent);
+  int noofblocksreq;
+  if(((contentlen-1)%DATABLOCK_SIZE)==0)
+  {
+    noofblocksreq=(contentlen-1)/DATABLOCK_SIZE;
+  }
+  else
+  {
+    noofblocksreq=(int)(floor(((double)(contentlen-1))/DATABLOCK_SIZE))+1;//dont know how to get floor so rewrite correctly
+  }
+  char * currblockcontent=(char *)malloc(sizeof(char)*DATABLOCK_SIZE);
+  strncpy(currblockcontent,blockcontent,DATABLOCK_SIZE);
+  printf("block 1 contains --%s-- \n",currblockcontent);
+  file->noOfDatablocks=noofblocksreq;
+  datablock *temp=writeDataBlock(currblockcontent);
+  file->datablocksarray[0]=temp->id;
+  strcpy(sfssuperblock.datablocks[file->datablocksarray[0]].data,temp->data);
+  sfssuperblock.datablocks[file->datablocksarray[0]].currsize=temp->currsize;
+  for(int i=1;i<noofblocksreq-1;i++)
+  {
+    strncpy(currblockcontent,&blockcontent[i*DATABLOCK_SIZE],DATABLOCK_SIZE);
+    printf("block %d contains --%s-- \n",i+1,currblockcontent);
     datablock *temp=writeDataBlock(currblockcontent);
-    file->datablocksarray[0]=temp->id;
-    strcpy(sfssuperblock.datablocks[file->datablocksarray[0]].data,temp->data);
-    sfssuperblock.datablocks[file->datablocksarray[0]].currsize=temp->currsize;
-    //file->noOfDatablocks++;
-    // if(file->datablocksarray==NULL)
-    // {
-    //   printf("couldt get the first datablock itself!\n");
-    //   return 0;
-    // }
-
-
-    //first datablock written !
-    printf("4\n");
-    //datablock * head=file->datablocksarray;
-
-    for(int i=1;i<noofblocksreq-1;i++)
-    {
-
-      printf("5\n");
-      //put the next set of content for the currblockcontent here!
-      strncpy(currblockcontent,&blockcontent[i*DATABLOCK_SIZE],DATABLOCK_SIZE);
-      printf("curr block contains --%s-- and the len is --%ld--\n",currblockcontent,strlen(currblockcontent));
-      // head->nextdatablock=writeDataBlock(currblockcontent);
-      // if(head->nextdatablock==NULL)
-      // {
-      //   printf("failure!\n");
-      //   return 0;
-      // }
-      // head=head->nextdatablock;
-      // file->noOfDatablocks++;
-
-
-      datablock *temp=writeDataBlock(currblockcontent);
-      file->datablocksarray[i]=temp->id;
-      strcpy(sfssuperblock.datablocks[file->datablocksarray[i]].data,temp->data);
-      sfssuperblock.datablocks[file->datablocksarray[i]].currsize=temp->currsize;
-      //file->noOfDatablocks++;
-
-        printf("6\n");
-
-    }
-    //last datablock to be written
-    if(noofblocksreq>=2)
-    {
-      printf("7\n");
-      strcpy(currblockcontent,&blockcontent[(noofblocksreq-1)*DATABLOCK_SIZE]);
-      printf("curr block contains --%s-- and the len is --%ld--\n",currblockcontent,strlen(currblockcontent));
-
-      datablock *temp=writeDataBlock(currblockcontent);
-      file->datablocksarray[noofblocksreq-1]=temp->id;
-      strcpy(sfssuperblock.datablocks[file->datablocksarray[noofblocksreq-1]].data,temp->data);
-      sfssuperblock.datablocks[file->datablocksarray[noofblocksreq-1]].currsize=temp->currsize;
-
-      // head->nextdatablock=writeDataBlock(currblockcontent);
-      // if(head->nextdatablock==NULL)
-      // {
-      //   printf("failure 2!\n");
-      //   return 0;
-      // }
-       printf("8\n");
-      // //go to the last datablock now and set uska next as null
-      // head=head->nextdatablock;
-      // head->nextdatablock=NULL;
-      // file->noOfDatablocks++;
-    }
+    file->datablocksarray[i]=temp->id;
+    strcpy(sfssuperblock.datablocks[file->datablocksarray[i]].data,temp->data);
+    sfssuperblock.datablocks[file->datablocksarray[i]].currsize=temp->currsize;
+  }
+  //last datablock to be written
+  if(noofblocksreq>=2)
+  {
+    strcpy(currblockcontent,&blockcontent[(noofblocksreq-1)*DATABLOCK_SIZE]);
+    printf("block %d contains --%s-- \n",noofblocksreq,currblockcontent);
+    datablock *temp=writeDataBlock(currblockcontent);
+    file->datablocksarray[noofblocksreq-1]=temp->id;
+    strcpy(sfssuperblock.datablocks[file->datablocksarray[noofblocksreq-1]].data,temp->data);
+    sfssuperblock.datablocks[file->datablocksarray[noofblocksreq-1]].currsize=temp->currsize;
+  }
     entry->currfilepointer=contentlen-1;
     printf("the current filepointer is set to --%d--\n",entry->currfilepointer);
     printf("total no of datblocks in the file now are --%d--\n",file->noOfDatablocks);
     return 1;
-  //}
-  return 0;
-
 }
 
+int sfsmkdir(char * name)
+{
+    return createInode(name,"directory");
+}
 
+int sfsrmdir(char * name)
+{
 
-  int sfsmkdir(char * name)
-  {
-      return createInode(name,"directory");
-  }
-  int sfsrmdir(char * name)
-  {
-
-    inode *file=getInodeFromCurrDirectory(name,"directory");
-    return deleteInode(file);
-  }
-
-
-
+  inode *file=getInodeFromCurrDirectory(name,"directory");
+  return deleteInode(file);
+}
 
 int sfslseek(char *name,int who,int offset)
 {
-  //find the inode with this name in currdirectory and then call isPresent in filetable using the filedescriptor and the who and then get that filetable entry and modify the curr file pointer
-  inode * file=NULL;
-  printf("1\n");
-  file=getInodeFromCurrDirectory(name,"file");
-  printf("2\n");
+  inode * file=getInodeFromCurrDirectory(name,"file");
   if(file ==NULL)
   {
-    printf("3\n");
-    return 0;//couldnt get the inode with this name
+    return 0;
   }
   else
   {
-    printf("4\n");
     filetable * entry=NULL;
     entry =getEntry(file->id,who);
-    printf("5\n");
     if(entry==NULL)
     {
-      printf("6\n");
       return 0;//not present in the filetable so cant sfslseek
     }
     else
     {
       entry->currfilepointer=offset;
-      printf("set currfilepointer to --%d--\n",entry->currfilepointer);
+      printf("set currfilepointer of file %s to --%d--\n",name,entry->currfilepointer);
       return 1;
     }
   }
-  printf("8\n");
   return 0;
 }

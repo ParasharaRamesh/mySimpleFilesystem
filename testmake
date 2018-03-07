@@ -1,2 +1,0 @@
-test: testshell.c utility.c filetable.c inode.c superblock.c datablock.c sfs.c
-	gcc -g -o test testshell.c utility.c filetable.c inode.c superblock.c datablock.c sfs.c -lm

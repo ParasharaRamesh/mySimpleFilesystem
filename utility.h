@@ -29,9 +29,8 @@ int getSizeOfFile(inode * file);
 //datablock utility functions
 
 //superblock utility functions
-
+void showSuperBlockStatus();
 //automount utility functions
 
 //dumpfs utility functions
-void plog(FILE * file,char *input,char *content,int mode);
 #endif

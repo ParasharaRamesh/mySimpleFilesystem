@@ -4,7 +4,6 @@
 #include<string.h>
 #include<sys/time.h>
 
-//filetable * FileTable=(filetable *)malloc(sizeof(filetable)*5);
 filetable FileTable[5];
 extern int currentshellpid;
 
@@ -27,14 +26,11 @@ filetable* getEntry(int fd,int who)
 
 int addEntry(inode *file,int who)
 {
-
-printf("1\n");
   if(getEntry(file->id,who)!=NULL)
   {
-    printf("this process already has this file open!\n");
+    //this process already has this file open!
     return 1;
   }
-printf("2\n");
   int fd=file->id;
   int count=0;
   for(int i=0;i<5;i++)
@@ -72,7 +68,6 @@ int removeEntry(inode *file,int who)
     }
   }
     return 0;
-
 }
 
 
